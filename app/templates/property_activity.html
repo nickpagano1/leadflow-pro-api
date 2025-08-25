@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Activity - LeadFlow Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <h1 class="text-xl font-bold text-gray-900">LeadFlow Pro</h1>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="/dashboard" class="text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium">Dashboard</a>
+                        <a href="/properties" class="text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium">Properties</a>
+                        <a href="/inquiries" class="text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium">Inquiries</a>
+                        <a href="/automation" class="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-gray-900 text-sm font-medium">Automation</a>
+                        <a href="/analytics" class="text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium">Analytics</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Back Button & Header -->
+        <div class="mb-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <button onclick="history.back()" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Back to Automation
+                    </button>
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900" id="propertyTitle">Property Activity</h1>
+                        <p class="text-gray-600" id="propertySubtitle">Loading property details...</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800" id="propertyStatus">
+                        Active
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Property Summary Card -->
+        <div class="bg-white rounded-lg border border-gray-200 shadow-sm mb-8">
+            <div class="px-6 py-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900" id="totalInquiries">-</div>
+                        <div class="text-sm text-gray-500">Total Inquiries</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900" id="autoReplies">-</div>
+                        <div class="text-sm text-gray-500">Auto Replies Sent</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900" id="responseRate">-</div>
+                        <div class="text-sm text-gray-500">Response Rate</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900" id="lastInquiry">-</div>
+                        <div class="text-sm text-gray-500">Last Inquiry</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Timeline -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Timeline -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-medium text-gray-900">Activity Timeline</h3>
+                            <div class="flex items-center space-x-2">
+                                <select id="filterType" class="text-sm border-gray-300 rounded-md">
+                                    <option value="all">All Activity</option>
+                                    <option value="inquiries">Inquiries Only</option>
+                                    <option value="emails">Emails Only</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-6 py-6">
+                        <div id="activityTimeline" class="space-y-6">
+                            <!-- Timeline items will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Stats -->
+            <div class="space-y-6">
+                <!-- Recent Inquiries -->
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900">Recent Inquiries</h3>
+                    </div>
+                    <div id="recentInquiriesList" class="divide-y divide-gray-200">
+                        <!-- Recent inquiries will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Property Details -->
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900">Property Details</h3>
+                    </div>
+                    <div class="px-6 py-6">
+                        <dl class="space-y-3">
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Monthly Rent</dt>
+                                <dd class="text-sm text-gray-900" id="propertyRent">-</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Bedrooms</dt>
+                                <dd class="text-sm text-gray-900" id="propertyBedrooms">-</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Bathrooms</dt>
+                                <dd class="text-sm text-gray-900" id="propertyBathrooms">-</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Square Feet</dt>
+                                <dd class="text-sm text-gray-900" id="propertySquareFeet">-</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Property Type</dt>
+                                <dd class="text-sm text-gray-900" id="propertyType">-</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Listed Since</dt>
+                                <dd class="text-sm text-gray-900" id="propertyCreated">-</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inquiry Detail Modal -->
+    <div id="inquiryModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">Inquiry Details</h3>
+                    <button onclick="closeInquiryModal()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Prospect Name</label>
+                        <p class="mt-1 text-sm text-gray-900" id="modalProspectName"></p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Email</label>
+                        <p class="mt-1 text-sm text-gray-900" id="modalProspectEmail"></p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Phone</label>
+                        <p class="mt-1 text-sm text-gray-900" id="modalProspectPhone"></p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Inquiry Date</label>
+                        <p class="mt-1 text-sm text-gray-900" id="modalInquiryDate"></p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Status</label>
+                        <div class="mt-1" id="modalInquiryStatus"></div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Message</label>
+                        <div class="mt-1 p-3 bg-gray-50 rounded-md">
+                            <p class="text-sm text-gray-900" id="modalInquiryMessage"></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button onclick="closeInquiryModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+                        Close
+                    </button>
+                    <button onclick="updateInquiryStatus()" class="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800">
+                        Update Status
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPropertyId = null;
+        let currentInquiry = null;
+        let allActivity = [];
+
+        // Get property ID from URL
+        function getPropertyIdFromUrl() {
+            const pathParts = window.location.pathname.split('/');
+            const propertyIndex = pathParts.indexOf('property');
+            if (propertyIndex !== -1 && pathParts[propertyIndex + 1]) {
+                return parseInt(pathParts[propertyIndex + 1]);
+            }
+            return null;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            currentPropertyId = getPropertyIdFromUrl();
+            
+            if (!currentPropertyId) {
+                alert('Property ID not found in URL');
+                window.location.href = '/automation';
+                return;
+            }
+
+            console.log('Loading property activity for ID:', currentPropertyId);
+            loadPropertyActivity();
+            
+            // Set up filter listener
+            document.getElementById('filterType').addEventListener('change', function() {
+                filterActivity(this.value);
+            });
+        });
+
+        // Load property details and activity
+        async function loadPropertyActivity() {
+            try {
+                // Load property details
+                const propertyResponse = await fetch(`/api/properties`);
+                const propertyData = await propertyResponse.json();
+                const property = propertyData.properties.find(p => p.id === currentPropertyId);
+                
+                if (!property) {
+                    throw new Error('Property not found');
+                }
+                
+                displayPropertyDetails(property);
+                
+                // Load inquiries for this property
+                const inquiriesResponse = await fetch(`/api/inquiries`);
+                const inquiriesData = await inquiriesResponse.json();
+                const propertyInquiries = inquiriesData.inquiries.filter(inquiry => inquiry.property_id === currentPropertyId);
+                
+                displayPropertyStats(propertyInquiries);
+                displayActivityTimeline(propertyInquiries);
+                displayRecentInquiries(propertyInquiries);
+                
+            } catch (error) {
+                console.error('Error loading property activity:', error);
+                alert('Error loading property details. Please try again.');
+            }
+        }
+
+        // Display property details
+        function displayPropertyDetails(property) {
+            document.getElementById('propertyTitle').textContent = `${property.address} ${property.unit || ''}`;
+            document.getElementById('propertySubtitle').textContent = `${property.property_type} • $${property.rent?.toLocaleString()}/month`;
+            
+            document.getElementById('propertyRent').textContent = `$${property.rent?.toLocaleString()}/month`;
+            document.getElementById('propertyBedrooms').textContent = property.bedrooms || 'N/A';
+            document.getElementById('propertyBathrooms').textContent = property.bathrooms || 'N/A';
+            document.getElementById('propertySquareFeet').textContent = property.sqft ? `${property.sqft.toLocaleString()} sq ft` : 'N/A';
+            document.getElementById('propertyType').textContent = property.property_type || 'N/A';
+            document.getElementById('propertyCreated').textContent = formatDate(property.created_at);
+        }
+
+        // Display property statistics
+        function displayPropertyStats(inquiries) {
+            const totalInquiries = inquiries.length;
+            const autoReplies = inquiries.filter(i => i.status === 'contacted').length;
+            const responseRate = totalInquiries > 0 ? Math.round((autoReplies / totalInquiries) * 100) : 0;
+            const lastInquiry = inquiries.length > 0 ? inquiries[inquiries.length - 1] : null;
+            
+            document.getElementById('totalInquiries').textContent = totalInquiries;
+            document.getElementById('autoReplies').textContent = autoReplies;
+            document.getElementById('responseRate').textContent = `${responseRate}%`;
+            document.getElementById('lastInquiry').textContent = lastInquiry ? formatDateRelative(lastInquiry.created_at) : 'Never';
+        }
+
+        // Display activity timeline
+        function displayActivityTimeline(inquiries) {
+            allActivity = [];
+            
+            // Add inquiries to activity
+            inquiries.forEach(inquiry => {
+                allActivity.push({
+                    type: 'inquiry',
+                    data: inquiry,
+                    timestamp: inquiry.created_at
+                });
+                
+                // Add auto-reply if status is contacted
+                if (inquiry.status === 'contacted') {
+                    allActivity.push({
+                        type: 'email',
+                        data: {
+                            ...inquiry,
+                            email_type: 'auto_reply'
+                        },
+                        timestamp: inquiry.created_at
+                    });
+                }
+            });
+            
+            // Sort by timestamp (newest first)
+            allActivity.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            filterActivity('all');
+        }
+
+        // Filter activity timeline
+        function filterActivity(filterType) {
+            let filteredActivity = allActivity;
+            
+            if (filterType === 'inquiries') {
+                filteredActivity = allActivity.filter(item => item.type === 'inquiry');
+            } else if (filterType === 'emails') {
+                filteredActivity = allActivity.filter(item => item.type === 'email');
+            }
+            
+            displayFilteredActivity(filteredActivity);
+        }
+
+        // Display filtered activity
+        function displayFilteredActivity(activity) {
+            const container = document.getElementById('activityTimeline');
+            
+            if (activity.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-500 py-8">No activity found for this property</div>';
+                return;
+            }
+            
+            container.innerHTML = activity.map((item, index) => {
+                const isLast = index === activity.length - 1;
+                
+                if (item.type === 'inquiry') {
+                    return `
+                        <div class="relative">
+                            ${!isLast ? '<div class="absolute left-4 top-8 bottom-0 w-0.5 bg-gray-200"></div>' : ''}
+                            <div class="relative flex items-start space-x-3">
+                                <div class="relative">
+                                    <div class="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center ring-8 ring-white">
+                                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="cursor-pointer" onclick="showInquiryDetails(${JSON.stringify(item.data).replace(/"/g, '&quot;')})">
+                                        <div class="text-sm text-gray-500">${formatDate(item.timestamp)}</div>
+                                        <div class="mt-1">
+                                            <p class="text-sm font-medium text-gray-900">New inquiry from ${item.data.prospect_name}</p>
+                                            <p class="text-sm text-gray-500">${item.data.prospect_email}</p>
+                                            <p class="text-sm text-gray-600 mt-1">${truncateText(item.data.original_message, 100)}</p>
+                                            <div class="mt-2">${getStatusBadge(item.data.status)}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else if (item.type === 'email') {
+                    return `
+                        <div class="relative">
+                            ${!isLast ? '<div class="absolute left-4 top-8 bottom-0 w-0.5 bg-gray-200"></div>' : ''}
+                            <div class="relative flex items-start space-x-3">
+                                <div class="relative">
+                                    <div class="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center ring-8 ring-white">
+                                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-sm text-gray-500">${formatDate(item.timestamp)}</div>
+                                    <div class="mt-1">
+                                        <p class="text-sm font-medium text-gray-900">Auto-reply sent to ${item.data.prospect_name}</p>
+                                        <p class="text-sm text-gray-500">${item.data.prospect_email}</p>
+                                        <div class="mt-2">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                Email Sent
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+
+        // Display recent inquiries sidebar
+        function displayRecentInquiries(inquiries) {
+            const container = document.getElementById('recentInquiriesList');
+            const recentInquiries = inquiries.slice(-5).reverse(); // Last 5, newest first
+            
+            if (recentInquiries.length === 0) {
+                container.innerHTML = '<div class="px-6 py-4 text-gray-500 text-center">No inquiries yet</div>';
+                return;
+            }
+            
+            container.innerHTML = recentInquiries.map(inquiry => `
+                <div class="px-6 py-4 hover:bg-gray-50 cursor-pointer" onclick="showInquiryDetails(${JSON.stringify(inquiry).replace(/"/g, '&quot;')})">
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900 truncate">${inquiry.prospect_name}</p>
+                            <p class="text-sm text-gray-500 truncate">${inquiry.prospect_email}</p>
+                            <p class="text-xs text-gray-400">${formatDateRelative(inquiry.created_at)}</p>
+                        </div>
+                        <div>${getStatusBadge(inquiry.status)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Show inquiry details modal
+        function showInquiryDetails(inquiry) {
+            currentInquiry = inquiry;
+            
+            document.getElementById('modalProspectName').textContent = inquiry.prospect_name;
+            document.getElementById('modalProspectEmail').textContent = inquiry.prospect_email;
+            document.getElementById('modalProspectPhone').textContent = inquiry.prospect_phone || 'Not provided';
+            document.getElementById('modalInquiryDate').textContent = formatDate(inquiry.created_at);
+            document.getElementById('modalInquiryMessage').textContent = inquiry.original_message;
+            document.getElementById('modalInquiryStatus').innerHTML = getStatusBadge(inquiry.status);
+            
+            document.getElementById('inquiryModal').classList.remove('hidden');
+        }
+
+        // Close inquiry modal
+        function closeInquiryModal() {
+            document.getElementById('inquiryModal').classList.add('hidden');
+            currentInquiry = null;
+        }
+
+        // Update inquiry status
+        async function updateInquiryStatus() {
+            if (!currentInquiry) return;
+            
+            // For now, just close the modal
+            // In future, you can add status update functionality
+            closeInquiryModal();
+        }
+
+        // Utility functions
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            });
+        }
+
+        function formatDateRelative(dateString) {
+            const now = new Date();
+            const date = new Date(dateString);
+            const diffInMs = now - date;
+            const diffInHours = diffInMs / (1000 * 60 * 60);
+            const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+            
+            if (diffInHours < 1) {
+                return 'Just now';
+            } else if (diffInHours < 24) {
+                return `${Math.floor(diffInHours)}h ago`;
+            } else if (diffInDays < 7) {
+                return `${Math.floor(diffInDays)}d ago`;
+            } else {
+                return formatDate(dateString);
+            }
+        }
+
+        function getStatusBadge(status) {
+            const statusMap = {
+                'new': 'bg-blue-100 text-blue-800',
+                'contacted': 'bg-green-100 text-green-800',
+                'scheduled': 'bg-yellow-100 text-yellow-800',
+                'closed': 'bg-gray-100 text-gray-800'
+            };
+            
+            const statusText = {
+                'new': 'New',
+                'contacted': 'Contacted',
+                'scheduled': 'Scheduled',
+                'closed': 'Closed'
+            };
+            
+            const colorClass = statusMap[status] || 'bg-gray-100 text-gray-800';
+            const text = statusText[status] || status;
+            
+            return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colorClass}">${text}</span>`;
+        }
+
+        function truncateText(text, maxLength) {
+            if (text.length <= maxLength) return text;
+            return text.substring(0, maxLength) + '...';
+        }
+    </script>
+</body>
+</html>
+<a href="/email-setup" class="text-gray-500 hover:text-gray-700">Email Setup</a>

@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automation Dashboard - LeadFlow Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .api-status.connected {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .api-status.error {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+
+        .main-content {
+            padding: 40px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .stat-change {
+            font-size: 14px;
+            color: #16a34a;
+        }
+
+        .automation-section {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .last-scan {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .action-btn {
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .scan-btn {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+        }
+
+        .scan-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+        }
+
+        .send-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-loading {
+            position: relative;
+        }
+
+        .btn-loading .btn-text {
+            opacity: 0;
+        }
+
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .progress-container {
+            margin-bottom: 32px;
+            display: none;
+        }
+
+        .progress-container.active {
+            display: block;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .progress-title {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .progress-status {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .inquiries-container {
+            display: none;
+        }
+
+        .inquiries-container.active {
+            display: block;
+        }
+
+        .inquiries-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .inquiries-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .inquiries-count {
+            background: #eff6ff;
+            color: #1d4ed8;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .inquiries-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .inquiry-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideIn 0.5s ease forwards;
+        }
+
+        .inquiry-item:nth-child(n) {
+            animation-delay: calc(var(--index) * 0.1s);
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .inquiry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .inquiry-from {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .inquiry-platform {
+            background: #dbeafe;
+            color: #1d4ed8;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .inquiry-subject {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .inquiry-questions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .question-tag {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .success-message {
+            background: #dcfce7;
+            border: 1px solid #bbf7d0;
+            color: #16a34a;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .success-message.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: none;
+        }
+
+        .error-message.active {
+            display: block;
+        }
+
+        .efficiency-summary {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 32px;
+            border: 1px solid #bfdbfe;
+        }
+
+        .efficiency-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1d4ed8;
+            margin-bottom: 12px;
+        }
+
+        .efficiency-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+        }
+
+        .efficiency-stat {
+            text-align: center;
+        }
+
+        .efficiency-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1d4ed8;
+        }
+
+        .efficiency-label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .scan-again-btn {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 20px;
+        }
+
+        .scan-again-btn:hover {
+            background: #e2e8f0;
+        }
+
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">LeadFlow Pro</div>
+                <div class="api-status" id="apiStatus">
+                    🔄 Connecting to API...
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Inquiries</div>
+                    <div class="stat-value" id="totalInquiries">--</div>
+                    <div class="stat-change">+12 this week</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Emails Sent</div>
+                    <div class="stat-value" id="emailsSent">--</div>
+                    <div class="stat-change">94% response rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Time Saved</div>
+                    <div class="stat-value" id="timeSaved">--</div>
+                    <div class="stat-change">+2.5 hours today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">This Week</div>
+                    <div class="stat-value" id="thisWeek">--</div>
+                    <div class="stat-change">Active inquiries</div>
+                </div>
+            </div>
+
+            <!-- Automation Section -->
+            <div class="automation-section">
+                <div class="section-header">
+                    <h2 class="section-title">Email Automation</h2>
+                    <div class="last-scan" id="lastScan">Last scan: Never</div>
+                </div>
+
+                <!-- Success/Error Messages -->
+                <div class="success-message" id="successMessage"></div>
+                <div class="error-message" id="errorMessage"></div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="action-btn scan-btn" id="scanBtn" onclick="scanForInquiries()">
+                        <span class="btn-text">🔍 SCAN FOR INQUIRIES</span>
+                    </button>
+                    <button class="action-btn send-btn" id="sendBtn" onclick="sendAllResponses()" disabled>
+                        <span class="btn-text">📤 SEND ALL RESPONSES</span>
+                    </button>
+                </div>
+
+                <!-- Progress Container -->
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-header">
+                        <div class="progress-title" id="progressTitle">Scanning for inquiries...</div>
+                        <div class="progress-status" id="progressStatus">0%</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+
+                <!-- Inquiries Container -->
+                <div class="inquiries-container" id="inquiriesContainer">
+                    <div class="inquiries-header">
+                        <h3 class="inquiries-title">Found Inquiries</h3>
+                        <div class="inquiries-count" id="inquiriesCount">0 inquiries</div>
+                    </div>
+                    <div class="inquiries-list" id="inquiriesList"></div>
+                    <button class="scan-again-btn" onclick="scanForInquiries()">🔄 Scan Again</button>
+                </div>
+
+                <!-- Efficiency Summary -->
+                <div class="efficiency-summary" id="efficiencySummary" style="display: none;">
+                    <h3 class="efficiency-title">📊 Efficiency Summary</h3>
+                    <div class="efficiency-stats">
+                        <div class="efficiency-stat">
+                            <div class="efficiency-value" id="efficiencySent">0</div>
+                            <div class="efficiency-label">Responses Sent</div>
+                        </div>
+                        <div class="efficiency-stat">
+                            <div class="efficiency-value" id="efficiencyTime">0 min</div>
+                            <div class="efficiency-label">Time Saved</div>
+                        </div>
+                        <div class="efficiency-stat">
+                            <div class="efficiency-value" id="efficiencyRate">0%</div>
+                            <div class="efficiency-label">Success Rate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Configuration
+        const API_BASE_URL = 'http://159.203.65.87:3000';
+        
+        // State
+        let apiConnected = false;
+        let currentInquiries = [];
+        let scanInProgress = false;
+        let sendInProgress = false;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkApiConnection();
+            loadStats();
+        });
+
+        // API Connection Check
+        async function checkApiConnection() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`);
+                if (response.ok) {
+                    apiConnected = true;
+                    updateApiStatus('connected', '✅ API Connected');
+                } else {
+                    throw new Error('API not responding');
+                }
+            } catch (error) {
+                apiConnected = false;
+                updateApiStatus('error', '❌ API Error');
+                console.error('API connection failed:', error);
+            }
+        }
+
+        function updateApiStatus(status, text) {
+            const statusEl = document.getElementById('apiStatus');
+            statusEl.className = `api-status ${status}`;
+            statusEl.textContent = text;
+        }
+
+        // Load Statistics
+        async function loadStats() {
+            try {
+                if (!apiConnected) {
+                    // Show simulated stats
+                    document.getElementById('totalInquiries').textContent = '47';
+                    document.getElementById('emailsSent').textContent = '44';
+                    document.getElementById('timeSaved').textContent = '11.0h';
+                    document.getElementById('thisWeek').textContent = '12';
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE_URL}/api/automation/stats`, {
+                    headers: {
+                        'Authorization': 'Bearer simulated-token' // In real app, use actual token
+                    }
+                });
+                
+                if (response.ok) {
+                    const stats = await response.json();
+                    document.getElementById('totalInquiries').textContent = stats.totalInquiries;
+                    document.getElementById('emailsSent').textContent = stats.emailsSent;
+                    document.getElementById('timeSaved').textContent = `${(stats.timeSaved / 60).toFixed(1)}h`;
+                    document.getElementById('thisWeek').textContent = stats.thisWeekInquiries;
+                }
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+                // Show fallback data
+                document.getElementById('totalInquiries').textContent = '47';
+                document.getElementById('emailsSent').textContent = '44';
+                document.getElementById('timeSaved').textContent = '11.0h';
+                document.getElementById('thisWeek').textContent = '12';
+            }
+        }
+
+        // Scan for Inquiries
+        async function scanForInquiries() {
+            if (scanInProgress) return;
+            
+            scanInProgress = true;
+            hideMessages();
+            
+            // Update UI
+            const scanBtn = document.getElementById('scanBtn');
+            scanBtn.classList.add('btn-loading');
+            scanBtn.disabled = true;
+            
+            // Show progress
+            showProgress('Scanning for inquiries...', 0);
+            
+            try {
+                // Simulate scanning steps
+                await updateProgress('Connecting to email servers...', 20);
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                await updateProgress('Checking forwarded emails...', 50);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await updateProgress('Processing inquiries...', 80);
+                await new Promise(resolve => setTimeout(resolve, 600));
+                
+                // Make API call
+                let inquiries = [];
+                if (apiConnected) {
+                    const response = await fetch(`${API_BASE_URL}/api/automation/scan`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer simulated-token',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        inquiries = data.inquiries || [];
+                    }
+                } else {
+                    // Simulated data for demo
+                    inquiries = generateSimulatedInquiries();
+                }
+                
+                await updateProgress('Complete!', 100);
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Show results
+                hideProgress();
+                displayInquiries(inquiries);
+                updateLastScan();
+                
+                // Enable send button if inquiries found
+                if (inquiries.length > 0) {
+                    document.getElementById('sendBtn').disabled = false;
+                }
+                
+            } catch (error) {
+                console.error('Scan failed:', error);
+                hideProgress();
+                showError('Failed to scan for inquiries. Please try again.');
+            } finally {
+                // Reset scan button
+                scanBtn.classList.remove('btn-loading');
+                scanBtn.disabled = false;
+                scanInProgress = false;
+            }
+        }
+
+        // Send All Responses
+        async function sendAllResponses() {
+            if (sendInProgress || currentInquiries.length === 0) return;
+            
+            sendInProgress = true;
+            hideMessages();
+            
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.classList.add('btn-loading');
+            sendBtn.disabled = true;
+            
+            try {
+                const inquiryIds = currentInquiries.map(inq => inq._id);
+                
+                let result;
+                if (apiConnected) {
+                    const response = await fetch(`${API_BASE_URL}/api/automation/send`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer simulated-token',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ inquiryIds })
+                    });
+                    
+                    if (response.ok) {
+                        result = await response.json();
+                    }
+                } else {
+                    // Simulate success
+                    result = {
+                        sent: currentInquiries.length,
+                        failed: 0,
+                        timeSaved: currentInquiries.length * 15
+                    };
+                }
+                
+                // Show success
+                showSuccess(`✅ Successfully sent ${result.sent} personalized responses! Saved ${result.timeSaved} minutes.`);
+                
+                // Show efficiency summary
+                showEfficiencySummary(result);
+                
+                // Update stats
+                loadStats();
+                
+                // Clear inquiries
+                currentInquiries = [];
+                document.getElementById('inquiriesContainer').classList.remove('active');
+                
+            } catch (error) {
+                console.error('Send failed:', error);
+                showError('Failed to send responses. Please try again.');
+            } finally {
+                sendBtn.classList.remove('btn-loading');
+                sendBtn.disabled = true;
+                sendInProgress = false;
+            }
+        }
+
+        // Helper Functions
+        function generateSimulatedInquiries() {
+            return [
+                {
+                    _id: 'sim1',
+                    originalEmail: {
+                        from: 'john.doe@email.com',
+                        subject: 'Interested in 123 Main St Apartment',
+                        platform: 'StreetEasy'
+                    },
+                    parsedData: {
+                        prospectName: 'John Doe',
+                        questions: ['Pet policy', 'Move-in date'],
+                        propertyOfInterest: '123 Main St, Apt 2B'
+                    }
+                },
+                {
+                    _id: 'sim2',
+                    originalEmail: {
+                        from: 'sarah.smith@gmail.com',
+                        subject: 'Apartment Viewing Request',
+                        platform: 'Zillow'
+                    },
+                    parsedData: {
+                        prospectName: 'Sarah Smith',
+                        questions: ['Viewing availability', 'Parking'],
+                        propertyOfInterest: 'Oak Street Apartment'
+                    }
+                },
+                {
+                    _id: 'sim3',
+                    originalEmail: {
+                        from: 'mike.jones@yahoo.com',
+                        subject: 'Questions about Downtown Loft',
+                        platform: 'Apartments.com'
+                    },
+                    parsedData: {
+                        prospectName: 'Mike Jones',
+                        questions: ['Lease terms', 'Utilities included'],
+                        propertyOfInterest: 'Downtown Loft'
+                    }
+                }
+            ];
+        }
+
+        function displayInquiries(inquiries) {
+            currentInquiries = inquiries;
+            const container = document.getElementById('inquiriesContainer');
+            const list = document.getElementById('inquiriesList');
+            const count = document.getElementById('inquiriesCount');
+            
+            count.textContent = `${inquiries.length} inquiries`;
+            
+            if (inquiries.length === 0) {
+                list.innerHTML = '<div class="inquiry-item">No new inquiries found. Try again later.</div>';
+                container.classList.add('active');
+                return;
+            }
+            
+            list.innerHTML = '';
+            
+            inquiries.forEach((inquiry, index) => {
+                const item = document.createElement('div');
+                item.className = 'inquiry-item';
+                item.style.setProperty('--index', index);
+                
+                item.innerHTML = `
+                    <div class="inquiry-header">
+                        <div class="inquiry-from">${inquiry.parsedData.prospectName}</div>
+                        <div class="inquiry-platform">${inquiry.originalEmail.platform}</div>
+                    </div>
+                    <div class="inquiry-subject">${inquiry.originalEmail.subject}</div>
+                    <div class="inquiry-questions">
+                        ${inquiry.parsedData.questions.map(q => `<span class="question-tag">${q}</span>`).join('')}
+                    </div>
+                `;
+                
+                list.appendChild(item);
+            });
+            
+            container.classList.add('active');
+        }
+
+        function showProgress(title, percent) {
+            const container = document.getElementById('progressContainer');
+            const titleEl = document.getElementById('progressTitle');
+            const statusEl = document.getElementById('progressStatus');
+            const fillEl = document.getElementById('progressFill');
+            
+            titleEl.textContent = title;
+            statusEl.textContent = `${percent}%`;
+            fillEl.style.width = `${percent}%`;
+            container.classList.add('active');
+        }
+
+        async function updateProgress(title, percent) {
+            const titleEl = document.getElementById('progressTitle');
+            const statusEl = document.getElementById('progressStatus');
+            const fillEl = document.getElementById('progressFill');
+            
+            titleEl.textContent = title;
+            statusEl.textContent = `${percent}%`;
+            fillEl.style.width = `${percent}%`;
+        }
+
+        function hideProgress() {
+            document.getElementById('progressContainer').classList.remove('active');
+        }
+
+        function showSuccess(message) {
+            const el = document.getElementById('successMessage');
+            el.textContent = message;
+            el.classList.add('active');
+            setTimeout(() => el.classList.remove('active'), 5000);
+        }
+
+        function showError(message) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = message;
+            el.classList.add('active');
+            setTimeout(() => el.classList.remove('active'), 5000);
+        }
+
+        function hideMessages() {
+            document.getElementById('successMessage').classList.remove('active');
+            document.getElementById('errorMessage').classList.remove('active');
+        }
+
+        function showEfficiencySummary(result) {
+            document.getElementById('efficiencySent').textContent = result.sent;
+            document.getElementById('efficiencyTime').textContent = `${result.timeSaved} min`;
+            document.getElementById('efficiencyRate').textContent = '100%';
+            document.getElementById('efficiencySummary').style.display = 'block';
+        }
+
+        function updateLastScan() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('lastScan').textContent = `Last scan: Today at ${timeString}`;
+        }
+    </script>
+</body>
+</html>

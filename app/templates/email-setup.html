@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Setup - LeadFlow Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        .card-shadow {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        .card-shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .pulse-ring {
+            animation: pulse-ring 2s infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.33); }
+            40%, 50% { opacity: 1; }
+            100% { opacity: 0; transform: scale(1.2); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-8">
+                    <h1 class="text-xl font-semibold text-gray-900">LeadFlow Pro</h1>
+                    <div class="hidden md:flex space-x-8">
+                        <a href="/dashboard" class="text-gray-500 hover:text-gray-700">Dashboard</a>
+                        <a href="/properties" class="text-gray-500 hover:text-gray-700">Properties</a>
+                        <a href="/inquiries" class="text-gray-500 hover:text-gray-700">Inquiries</a>
+                        <a href="/automation" class="text-gray-500 hover:text-gray-700">Automation</a>
+                        <a href="/calendar" class="text-gray-500 hover:text-gray-700">Calendar</a>
+                        <a href="/email-setup" class="text-blue-600 font-medium">Email Setup</a>
+                        <a href="/analytics" class="text-gray-500 hover:text-gray-700">Analytics</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-500" id="agentName">Loading...</span>
+                    <button onclick="logout()" class="text-sm font-medium text-red-600 hover:text-red-500">
+                        Sign out
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="flex items-center justify-center min-h-screen">
+        <div class="text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p class="text-gray-600">Loading email setup...</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="emailSetupContent" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Email Setup & Configuration</h1>
+            <p class="text-gray-600 mt-2">Configure your specialized email addresses for maximum automation efficiency</p>
+        </div>
+
+        <!-- Setup Progress -->
+        <div class="bg-white rounded-lg card-shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Setup Progress</h3>
+                <span class="text-sm text-gray-500" id="setupProgress">0/4 Complete</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="flex items-center space-x-3" id="step1">
+                    <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                        <span class="text-gray-600 font-medium text-sm">1</span>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">Generate Aliases</p>
+                        <p class="text-xs text-gray-500">Create specialized emails</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3" id="step2">
+                    <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                        <span class="text-gray-600 font-medium text-sm">2</span>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">Setup Forwarding</p>
+                        <p class="text-xs text-gray-500">Configure email rules</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3" id="step3">
+                    <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                        <span class="text-gray-600 font-medium text-sm">3</span>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">Test System</p>
+                        <p class="text-xs text-gray-500">Verify automation</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3" id="step4">
+                    <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                        <span class="text-gray-600 font-medium text-sm">4</span>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">Go Live</p>
+                        <p class="text-xs text-gray-500">Start automation</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email Aliases -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Generate Aliases -->
+            <div class="bg-white rounded-lg card-shadow-lg p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">Your Email Aliases</h3>
+                    <button onclick="generateAliases()" id="generateBtn" 
+                        class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
+                        Generate Aliases
+                    </button>
+                </div>
+                
+                <div id="aliasesContainer" class="space-y-4">
+                    <!-- Aliases will be loaded here -->
+                    <div class="text-center py-8 text-gray-500">
+                        <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        <p>Click "Generate Aliases" to create your specialized email addresses</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Setup Instructions -->
+            <div class="bg-white rounded-lg card-shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">Setup Instructions</h3>
+                
+                <div class="space-y-6">
+                    <!-- Gmail Instructions -->
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-900 mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-red-500" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-.904.732-1.636 1.636-1.636h3.819l6.545 4.91 6.545-4.91h3.819A1.636 1.636 0 0 1 24 5.457z"/>
+                            </svg>
+                            Gmail Setup
+                        </h4>
+                        <ol class="text-sm text-gray-600 space-y-2">
+                            <li>1. Go to Gmail Settings → Filters and Blocked Addresses</li>
+                            <li>2. Create filter for emails from: <code class="bg-gray-100 px-1 rounded">noreply@streeteasy.com</code></li>
+                            <li>3. Forward to your StreetEasy alias (generated above)</li>
+                            <li>4. Repeat for Zillow: <code class="bg-gray-100 px-1 rounded">noreply@zillow.com</code></li>
+                        </ol>
+                        <button onclick="showGmailInstructions()" class="mt-3 text-blue-600 hover:text-blue-500 text-sm font-medium">
+                            View Detailed Instructions →
+                        </button>
+                    </div>
+
+                    <!-- Outlook Instructions -->
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-900 mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7.462 0C4.965 0 2.95 2.014 2.95 4.512v14.976C2.95 21.986 4.965 24 7.462 24h9.076C18.035 24 20.05 21.986 20.05 19.488V4.512C20.05 2.014 18.035 0 16.538 0H7.462zM12 6.545c2.133 0 3.864 1.731 3.864 3.864s-1.731 3.864-3.864 3.864-3.864-1.731-3.864-3.864S9.867 6.545 12 6.545z"/>
+                            </svg>
+                            Outlook Setup
+                        </h4>
+                        <ol class="text-sm text-gray-600 space-y-2">
+                            <li>1. Go to Outlook Settings → Mail → Rules</li>
+                            <li>2. Create rule: "From address contains streeteasy.com"</li>
+                            <li>3. Action: "Forward to" your StreetEasy alias</li>
+                            <li>4. Repeat for Zillow inquiries</li>
+                        </ol>
+                        <button onclick="showOutlookInstructions()" class="mt-3 text-blue-600 hover:text-blue-500 text-sm font-medium">
+                            View Detailed Instructions →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email Statistics -->
+        <div class="bg-white rounded-lg card-shadow-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Email Activity</h3>
+                <p class="text-sm text-gray-500 mt-1">Track incoming emails and processing status</p>
+            </div>
+            
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-blue-600" id="totalEmailsReceived">0</div>
+                        <div class="text-sm text-gray-500">Total Emails Received</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-green-600" id="emailsProcessed">0</div>
+                        <div class="text-sm text-gray-500">Successfully Processed</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-purple-600" id="autoRepliesSent">0</div>
+                        <div class="text-sm text-gray-500">Auto Replies Sent</div>
+                    </div>
+                </div>
+
+                <!-- Recent Email Activity -->
+                <div id="recentEmailActivity">
+                    <h4 class="font-medium text-gray-900 mb-4">Recent Email Activity</h4>
+                    <div class="text-center py-8 text-gray-500">
+                        <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                        </svg>
+                        <p>No email activity yet</p>
+                        <p class="text-sm">Complete setup to start receiving inquiries</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Instructions Modal -->
+    <div id="instructionsModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900" id="modalTitle">Setup Instructions</h3>
+                    <button onclick="closeInstructionsModal()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div id="modalContent">
+                    <!-- Detailed instructions will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let agentData = null;
+        let aliases = [];
+
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthentication();
+        });
+
+        async function checkAuthentication() {
+            const token = localStorage.getItem('access_token');
+            
+            if (!token) {
+                window.location.href = '/login';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/agent/profile', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    agentData = await response.json();
+                    loadEmailSetupPage();
+                } else {
+                    localStorage.removeItem('access_token');
+                    window.location.href = '/login';
+                }
+            } catch (error) {
+                console.error('Authentication check failed:', error);
+                localStorage.removeItem('access_token');
+                window.location.href = '/login';
+            }
+        }
+
+        async function loadEmailSetupPage() {
+            try {
+                const token = localStorage.getItem('access_token');
+                
+                // Update agent name
+                document.getElementById('agentName').textContent = agentData.name;
+
+                // Load existing aliases
+                await loadAliases();
+
+                // Show content
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('emailSetupContent').classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Error loading email setup page:', error);
+                showMessage('Error loading email setup', 'error');
+            }
+        }
+
+        async function loadAliases() {
+            try {
+                const token = localStorage.getItem('access_token');
+                const response = await fetch('/api/agents/email-aliases', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+                aliases = data.aliases || [];
+
+                renderAliases(aliases);
+                updateSetupProgress();
+
+            } catch (error) {
+                console.error('Error loading aliases:', error);
+            }
+        }
+
+        async function generateAliases() {
+            const generateBtn = document.getElementById('generateBtn');
+            const originalText = generateBtn.innerHTML;
+            
+            generateBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Generating...';
+            generateBtn.disabled = true;
+
+            try {
+                const token = localStorage.getItem('access_token');
+                const response = await fetch('/api/agents/setup-email-aliases', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('Email aliases generated successfully!', 'success');
+                    await loadAliases();
+                } else {
+                    showMessage('Error generating aliases', 'error');
+                }
+            } catch (error) {
+                console.error('Error generating aliases:', error);
+                showMessage('Network error', 'error');
+            } finally {
+                generateBtn.innerHTML = originalText;
+                generateBtn.disabled = false;
+            }
+        }
+
+        function renderAliases(aliases) {
+            const container = document.getElementById('aliasesContainer');
+            
+            if (aliases.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        <p>Click "Generate Aliases" to create your specialized email addresses</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const aliasColors = {
+                'streeteasy': 'bg-blue-100 text-blue-800',
+                'zillow': 'bg-green-100 text-green-800', 
+                'general': 'bg-purple-100 text-purple-800',
+                'sms': 'bg-yellow-100 text-yellow-800'
+            };
+
+            const aliasIcons = {
+                'streeteasy': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>',
+                'zillow': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m0 0v-6a1 1 0 011-1h2a1 1 0 011 1v6m3 0a1 1 0 001-1V10M9 21h6"></path>',
+                'general': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>',
+                'sms': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>'
+            };
+
+            container.innerHTML = aliases.map(alias => `
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 ${aliasColors[alias.alias_type]} rounded-lg flex items-center justify-center">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    ${aliasIcons[alias.alias_type]}
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-900 capitalize">${alias.alias_type.replace('_', ' ')} Email</h4>
+                                <code class="text-sm text-gray-600 font-mono">${alias.alias_email}</code>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm text-gray-500">${alias.emails_received || 0} emails</span>
+                            <button onclick="copyToClipboard('${alias.alias_email}')" 
+                                class="text-blue-600 hover:text-blue-500 text-sm font-medium">
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateSetupProgress() {
+            let completedSteps = 0;
+            
+            // Step 1: Aliases generated
+            if (aliases.length > 0) {
+                updateStepStatus('step1', true);
+                completedSteps++;
+            }
+            
+            // Step 2: Forwarding setup (check if any emails received)
+            if (aliases.some(alias => alias.emails_received > 0)) {
+                updateStepStatus('step2', true);
+                completedSteps++;
+            }
+            
+            // Update progress
+            document.getElementById('setupProgress').textContent = `${completedSteps}/4 Complete`;
+        }
+
+        function updateStepStatus(stepId, completed) {
+            const step = document.getElementById(stepId);
+            const circle = step.querySelector('div');
+            
+            if (completed) {
+                circle.className = 'w-8 h-8 bg-green-500 rounded-full flex items-center justify-center';
+                circle.innerHTML = '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+            }
+        }
+
+        function showGmailInstructions() {
+            document.getElementById('modalTitle').textContent = 'Gmail Setup Instructions';
+            document.getElementById('modalContent').innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h4 class="font-medium text-blue-900 mb-2">Step-by-Step Gmail Setup</h4>
+                        <ol class="text-sm text-blue-800 space-y-2">
+                            <li><strong>1.</strong> Open Gmail and click the gear icon → "See all settings"</li>
+                            <li><strong>2.</strong> Go to "Filters and Blocked Addresses" tab</li>
+                            <li><strong>3.</strong> Click "Create a new filter"</li>
+                            <li><strong>4.</strong> In "From" field, enter: <code class="bg-blue-100 px-1 rounded">noreply@streeteasy.com</code></li>
+                            <li><strong>5.</strong> Click "Create filter"</li>
+                            <li><strong>6.</strong> Check "Forward it to" and select your StreetEasy alias</li>
+                            <li><strong>7.</strong> Repeat steps 3-6 for Zillow using: <code class="bg-blue-100 px-1 rounded">noreply@zillow.com</code></li>
+                        </ol>
+                    </div>
+                    
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <h4 class="font-medium text-yellow-900 mb-2">Important Notes</h4>
+                        <ul class="text-sm text-yellow-800 space-y-1">
+                            <li>• Make sure to enable forwarding for your aliases first</li>
+                            <li>• Filters apply to all future emails automatically</li>
+                            <li>• You can edit or delete filters anytime</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+            document.getElementById('instructionsModal').classList.remove('hidden');
+        }
+
+        function showOutlookInstructions() {
+            document.getElementById('modalTitle').textContent = 'Outlook Setup Instructions';
+            document.getElementById('modalContent').innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h4 class="font-medium text-blue-900 mb-2">Step-by-Step Outlook Setup</h4>
+                        <ol class="text-sm text-blue-800 space-y-2">
+                            <li><strong>1.</strong> Open Outlook on the web or desktop</li>
+                            <li><strong>2.</strong> Go to Settings → Mail → Rules</li>
+                            <li><strong>3.</strong> Click "Add new rule"</li>
+                            <li><strong>4.</strong> Name: "StreetEasy Forwarding"</li>
+                            <li><strong>5.</strong> Condition: "From address contains" → <code class="bg-blue-100 px-1 rounded">streeteasy.com</code></li>
+                            <li><strong>6.</strong> Action: "Forward to" → Enter your StreetEasy alias</li>
+                            <li><strong>7.</strong> Save rule and repeat for Zillow</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <h4 class="font-medium text-yellow-900 mb-2">Corporate Email Notice</h4>
+                        <p class="text-sm text-yellow-800">
+                            If you're using a corporate email account, you may need IT approval for forwarding rules. 
+                            Contact your IT department if you encounter restrictions.
+                        </p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('instructionsModal').classList.remove('hidden');
+        }
+
+        function closeInstructionsModal() {
+            document.getElementById('instructionsModal').classList.add('hidden');
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showMessage('Email address copied to clipboard!', 'success');
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('access_token');
+            window.location.href = '/login';
+        }
+
+        function showMessage(message, type = 'info') {
+            const messageEl = document.createElement('div');
+            messageEl.className = `fixed top-4 right-4 max-w-sm w-full shadow-lg rounded-lg pointer-events-auto z-50`;
+            
+            const bgColor = type === 'success' ? 'bg-green-50 border-green-200' : 
+                           type === 'error' ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200';
+            
+            const textColor = type === 'success' ? 'text-green-800' : 
+                             type === 'error' ? 'text-red-800' : 'text-blue-800';
+            
+            messageEl.innerHTML = `
+                <div class="border ${bgColor} rounded-lg p-4">
+                    <div class="flex">
+                        <div class="flex-1">
+                            <p class="text-sm font-medium ${textColor}">${message}</p>
+                        </div>
+                        <div class="ml-4 flex-shrink-0">
+                            <button onclick="this.parentElement.parentElement.parentElement.parentElement.remove()" class="${textColor} hover:${textColor}">
+                                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(messageEl);
+            
+            setTimeout(() => {
+                if (messageEl.parentElement) {
+                    messageEl.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
+<a href="/email-setup" class="text-gray-500 hover:text-gray-700">Email Setup</a>

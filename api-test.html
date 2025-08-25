@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeadFlow Pro API Test</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        .test-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 10px 10px 0;
+            transition: background 0.2s;
+        }
+        .test-button:hover {
+            background: #2563eb;
+        }
+        .test-button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .success {
+            background: #dcfce7;
+            border: 1px solid #16a34a;
+            color: #15803d;
+        }
+        .error {
+            background: #fef2f2;
+            border: 1px solid #ef4444;
+            color: #dc2626;
+        }
+        .info {
+            background: #dbeafe;
+            border: 1px solid #3b82f6;
+            color: #1d4ed8;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .status.success { background: #dcfce7; color: #16a34a; }
+        .status.error { background: #fef2f2; color: #ef4444; }
+        .status.testing { background: #fef3c7; color: #d97706; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🚀 LeadFlow Pro API Connectivity Test</h1>
+        <p>This will test the connection between your frontend and your live API at <strong>159.203.65.87:3000</strong></p>
+        
+        <h3>API Endpoint Tests:</h3>
+        
+        <div class="test-group">
+            <button class="test-button" onclick="testHealthEndpoint()">
+                Test Health Endpoint
+                <span id="health-status" class="status"></span>
+            </button>
+            <div id="health-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-group">
+            <button class="test-button" onclick="testAllEndpoints()" id="test-all-btn">
+                Test All Endpoints
+                <span id="all-status" class="status"></span>
+            </button>
+            <div id="all-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-group">
+            <button class="test-button" onclick="testCORS()">
+                Test CORS Policy
+                <span id="cors-status" class="status"></span>
+            </button>
+            <div id="cors-result" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h3>🔧 Connection Details:</h3>
+        <p><strong>API Base URL:</strong> http://159.203.65.87:3000</p>
+        <p><strong>Your Location:</strong> <span id="client-info">Loading...</span></p>
+        <p><strong>Test Time:</strong> <span id="test-time"></span></p>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE_URL = 'http://159.203.65.87:3000';
+        
+        // Update test time
+        document.getElementById('test-time').textContent = new Date().toLocaleString();
+        
+        // Get client info
+        fetch('https://ipapi.co/json/')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('client-info').textContent = 
+                    `${data.city}, ${data.region}, ${data.country_name} (${data.ip})`;
+            })
+            .catch(error => {
+                document.getElementById('client-info').textContent = 'Unable to detect location';
+            });
+
+        // Helper functions
+        function updateStatus(elementId, status, text) {
+            const element = document.getElementById(elementId);
+            element.className = `status ${status}`;
+            element.textContent = text;
+        }
+
+        function showResult(elementId, content, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result ${type}`;
+            element.textContent = content;
+        }
+
+        // Test 1: Health Endpoint
+        async function testHealthEndpoint() {
+            updateStatus('health-status', 'testing', 'Testing...');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateStatus('health-status', 'success', '✅ SUCCESS');
+                    showResult('health-result', 
+                        `SUCCESS! ✅\n\nResponse Status: ${response.status}\nResponse Data:\n${JSON.stringify(data, null, 2)}`, 
+                        'success'
+                    );
+                } else {
+                    updateStatus('health-status', 'error', '❌ FAILED');
+                    showResult('health-result', 
+                        `ERROR: HTTP ${response.status}\n${JSON.stringify(data, null, 2)}`, 
+                        'error'
+                    );
+                }
+            } catch (error) {
+                updateStatus('health-status', 'error', '❌ FAILED');
+                showResult('health-result', 
+                    `CONNECTION ERROR: ${error.message}\n\nPossible causes:\n- API server is down\n- Firewall blocking connection\n- CORS policy issue\n- Network connectivity problem`, 
+                    'error'
+                );
+            }
+        }
+
+        // Test 2: All Endpoints
+        async function testAllEndpoints() {
+            updateStatus('all-status', 'testing', 'Testing...');
+            document.getElementById('test-all-btn').disabled = true;
+            
+            const endpoints = [
+                { method: 'GET', path: '/health', description: 'Health Check' },
+                { method: 'GET', path: '/', description: 'Root Endpoint' },
+                { method: 'POST', path: '/api/auth/register', description: 'User Registration (will fail without data - normal)' },
+                { method: 'POST', path: '/api/auth/login', description: 'User Login (will fail without data - normal)' }
+            ];
+            
+            let results = [];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}${endpoint.path}`, {
+                        method: endpoint.method,
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    const status = response.status;
+                    results.push(`✅ ${endpoint.method} ${endpoint.path} - Status: ${status} (${endpoint.description})`);
+                } catch (error) {
+                    results.push(`❌ ${endpoint.method} ${endpoint.path} - ERROR: ${error.message}`);
+                }
+            }
+            
+            updateStatus('all-status', 'success', '✅ COMPLETE');
+            showResult('all-result', 
+                `ENDPOINT TEST RESULTS:\n\n${results.join('\n\n')}`, 
+                'info'
+            );
+            
+            document.getElementById('test-all-btn').disabled = false;
+        }
+
+        // Test 3: CORS
+        async function testCORS() {
+            updateStatus('cors-status', 'testing', 'Testing...');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Test-Header': 'CORS-Test'
+                    }
+                });
+                
+                updateStatus('cors-status', 'success', '✅ PASSED');
+                showResult('cors-result', 
+                    `CORS TEST PASSED! ✅\n\nYour API properly handles cross-origin requests.\nThis means your frontend can communicate with your backend from any domain.`, 
+                    'success'
+                );
+            } catch (error) {
+                updateStatus('cors-status', 'error', '❌ FAILED');
+                showResult('cors-result', 
+                    `CORS ERROR: ${error.message}\n\nThis means there might be a CORS policy issue preventing your frontend from accessing the API.`, 
+                    'error'
+                );
+            }
+        }
+    </script>
+</body>
+</html>

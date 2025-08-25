@@ -1,0 +1,48 @@
+# ngrok Setup Instructions for LeadFlow Pro
+
+## Your LeadFlow Pro API is running successfully on:
+- Local URL: http://localhost:3000
+- Status: ✅ Working perfectly
+
+## To make it accessible from reflows.app, follow these steps:
+
+### Option 1: Fix ngrok (Recommended)
+1. Go to: https://dashboard.ngrok.com/get-started/your-authtoken
+2. Sign up for a free ngrok account
+3. Copy your new authtoken
+4. Run: ngrok config add-authtoken YOUR_NEW_TOKEN
+5. Run: ngrok http 3000
+6. Copy the https URL ngrok gives you
+7. Update your DNS settings to point reflows.app to that URL
+
+### Option 2: Alternative Services
+Use these instead of ngrok:
+- localtunnel: npm install -g localtunnel && lt --port 3000
+- serveo.net: ssh -R 80:localhost:3000 serveo.net
+- cloudflared: Download Cloudflare Tunnel
+
+### Option 3: Production Deployment (Best)
+Deploy to a real server:
+- DigitalOcean: $5/month droplet
+- AWS EC2: Free tier available
+- Railway.app: Simple deployment
+- Render.com: Free tier available
+
+### Your API Endpoints:
+- Health Check: GET /api/health
+- Register: POST /api/auth/register  
+- Login: POST /api/auth/login
+- Email Config: POST /api/email/config
+- Leads: GET/POST /api/leads
+- Campaigns: GET/POST /api/campaigns
+- Stats: GET /api/stats
+
+## Current Status:
+✅ Server running on port 3000
+✅ MongoDB connected
+✅ All APIs functional
+❌ Internet access blocked (need tunnel or proper hosting)
+
+## Next Steps:
+1. Get ngrok working with valid token, OR
+2. Deploy to proper hosting service

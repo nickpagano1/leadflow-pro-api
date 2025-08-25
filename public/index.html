@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeadFlow Pro API</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; }
+        .status { display: inline-block; padding: 5px 10px; border-radius: 5px; color: white; font-weight: bold; }
+        .online { background: #28a745; }
+        .endpoint { background: #f8f9fa; padding: 10px; margin: 10px 0; border-left: 4px solid #007bff; }
+        code { background: #e9ecef; padding: 2px 5px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 LeadFlow Pro API</h1>
+        <div class="status online">ONLINE</div>
+        
+        <h2>API Status</h2>
+        <p>✅ Server Running on Port 3000</p>
+        <p>✅ MongoDB Connected</p>
+        <p>✅ All Endpoints Functional</p>
+        
+        <h2>Available Endpoints</h2>
+        
+        <div class="endpoint">
+            <strong>Health Check</strong><br>
+            <code>GET /api/health</code>
+        </div>
+        
+        <div class="endpoint">
+            <strong>User Registration</strong><br>
+            <code>POST /api/auth/register</code>
+        </div>
+        
+        <div class="endpoint">
+            <strong>User Login</strong><br>
+            <code>POST /api/auth/login</code>
+        </div>
+        
+        <div class="endpoint">
+            <strong>Email Configuration</strong><br>
+            <code>GET/POST /api/email/config</code>
+        </div>
+        
+        <div class="endpoint">
+            <strong>Lead Management</strong><br>
+            <code>GET/POST /api/leads</code>
+        </div>
+        
+        <div class="endpoint">
+            <strong>Email Campaigns</strong><br>
+            <code>GET/POST /api/campaigns</code>
+        </div>
+        
+        <div class="endpoint">
+            <strong>Analytics & Stats</strong><br>
+            <code>GET /api/stats</code>
+        </div>
+        
+        <h2>Current Access</h2>
+        <p><strong>Public URL:</strong> <a href="https://wide-otters-appear.loca.lt" target="_blank">https://wide-otters-appear.loca.lt</a></p>
+        <p><strong>API Health:</strong> <a href="https://wide-otters-appear.loca.lt/api/health" target="_blank">Test API</a></p>
+        
+        <h2>Next Steps</h2>
+        <ol>
+            <li>Update DNS settings for reflows.app to point to the localtunnel URL</li>
+            <li>For production, deploy to a proper hosting service</li>
+            <li>Configure SSL certificate for custom domain</li>
+        </ol>
+    </div>
+</body>
+</html>

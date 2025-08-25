@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Properties - LeadFlow Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #000000;
+            --secondary-color: #666666;
+            --border-color: #e5e5e5;
+            --bg-light: #fafafa;
+            --bg-white: #ffffff;
+            --text-primary: #000000;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --radius: 8px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-light);
+        }
+
+        /* Navigation - Same as Dashboard */
+        .navbar {
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 400;
+            font-size: 14px;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--text-primary);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-info {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .logout-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .add-property-btn {
+            background: var(--text-primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s ease;
+        }
+
+        .add-property-btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-1px);
+        }
+
+        /* Properties Grid */
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .property-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .property-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .property-image {
+            height: 200px;
+            background: var(--bg-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 48px;
+        }
+
+        .property-content {
+            padding: 20px;
+        }
+
+        .property-address {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .property-details {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .property-rent {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .property-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .property-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+            border-radius: var(--radius);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .action-btn.primary {
+            background: var(--text-primary);
+            color: white;
+            border: none;
+        }
+
+        .action-btn.secondary {
+            background: var(--bg-white);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .action-btn.success {
+            background: var(--success-color);
+            color: white;
+            border: none;
+        }
+
+        .action-btn.warning {
+            background: var(--warning-color);
+            color: white;
+            border: none;
+        }
+
+        .action-btn.danger {
+            background: var(--error-color);
+            color: white;
+            border: none;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            position: absolute;
+            top: 12px;
+            right: 12px;
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-inactive {
+            background: rgba(107, 114, 128, 0.1);
+            color: var(--text-muted);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-secondary);
+            grid-column: 1 / -1;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 24px;
+            opacity: 0.5;
+        }
+
+        .empty-state-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .empty-state-description {
+            font-size: 16px;
+            margin-bottom: 24px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Loading State */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+            grid-column: 1 / -1;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--text-primary);
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Add Property Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--bg-white);
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            margin: 20px;
+        }
+
+        .modal-header {
+            padding: 24px 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 4px;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--text-primary);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: var(--text-primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background: var(--secondary-color);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .properties-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .main-container {
+                padding: 20px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">LeadFlow Pro</a>
+            <ul class="nav-links">
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="/properties" class="active">Properties</a></li>
+                <li><a href="/inquiries">Inquiries</a></li>
+                <li><a href="/automation">Automation</a></li>
+                <li><a href="/analytics">Analytics</a></li>
+            </ul>
+            <div class="user-menu">
+                <span class="user-info" id="userInfo">Loading...</span>
+                <button class="logout-btn" onclick="logout()">Sign out</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Properties</h1>
+                <p class="page-subtitle">Manage your property listings and availability</p>
+            </div>
+            <button class="add-property-btn" onclick="openAddPropertyModal()">Add Property</button>
+        </div>
+
+        <!-- Properties Grid -->
+        <div class="properties-grid" id="propertiesGrid">
+            <div class="loading active">
+                <div class="loading-spinner"></div>
+                <div>Loading properties...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Property Modal -->
+    <div class="modal" id="editPropertyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Property</h3>
+                <button class="close-btn" onclick="closeEditPropertyModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="editPropertyForm">
+                    <input type="hidden" id="editPropertyId">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Property Address *</label>
+                        <input type="text" id="editAddress" class="form-input" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Unit/Apt</label>
+                            <input type="text" id="editUnit" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Monthly Rent *</label>
+                            <input type="number" id="editRent" class="form-input" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Bedrooms *</label>
+                            <input type="number" id="editBedrooms" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Bathrooms *</label>
+                            <input type="number" step="0.5" id="editBathrooms" class="form-input" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Square Feet</label>
+                            <input type="number" id="editSquareFeet" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Available Date</label>
+                            <input type="date" id="editAvailabilityDate" class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Acuity Scheduling ID</label>
+                        <input type="text" id="editAcuityId" class="form-input" placeholder="12345678">
+                        <small style="color: var(--text-muted); font-size: 12px; margin-top: 4px; display: block;">
+                            Enter your Acuity scheduling ID for automated booking links
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea id="editDescription" class="form-textarea"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Amenities</label>
+                        <textarea id="editAmenities" class="form-textarea"></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="editSubmitBtn">Update Property</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Property Modal -->
+    <div class="modal" id="addPropertyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Property</h3>
+                <button class="close-btn" onclick="closeAddPropertyModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addPropertyForm">
+                    <div class="form-group">
+                        <label class="form-label">Property Address *</label>
+                        <input type="text" id="address" class="form-input" placeholder="123 Main Street" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Unit/Apt</label>
+                            <input type="text" id="unit" class="form-input" placeholder="Unit 2A">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Monthly Rent *</label>
+                            <input type="number" id="rent" class="form-input" placeholder="2500" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Bedrooms *</label>
+                            <input type="number" id="bedrooms" class="form-input" placeholder="2" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Bathrooms *</label>
+                            <input type="number" step="0.5" id="bathrooms" class="form-input" placeholder="1.5" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Square Feet</label>
+                            <input type="number" id="squareFeet" class="form-input" placeholder="1200">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Available Date</label>
+                            <input type="date" id="availabilityDate" class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Acuity Scheduling ID</label>
+                        <input type="text" id="acuityId" class="form-input" placeholder="12345678">
+                        <small style="color: var(--text-muted); font-size: 12px; margin-top: 4px; display: block;">
+                            Enter your Acuity scheduling ID for automated booking links
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea id="description" class="form-textarea" placeholder="Beautiful 2-bedroom apartment with modern amenities..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Amenities</label>
+                        <textarea id="amenities" class="form-textarea" placeholder="Parking, Laundry, Gym, Pool..."></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn">Add Property</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allProperties = []; // Make sure this is declared at the top level
+
+        // Check authentication
+        function checkAuth() {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                window.location.href = '/login';
+                return false;
+            }
+            return true;
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('agent_id');
+            localStorage.removeItem('agent_name');
+            localStorage.removeItem('email');
+            window.location.href = '/login';
+        }
+
+        // Load properties - FIXED VERSION
+        async function loadProperties() {
+            if (!checkAuth()) return;
+
+            try {
+                // Update user info
+                const agentName = localStorage.getItem('agent_name') || 'User';
+                document.getElementById('userInfo').textContent = agentName;
+
+                console.log('Loading properties...');
+
+                const token = localStorage.getItem('access_token');
+                const response = await fetch('/api/properties', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                console.log('Properties API response status:', response.status);
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        logout();
+                        return;
+                    }
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Properties API response data:', data);
+                
+                // Handle different API response formats
+                let properties = [];
+                
+                if (data.success && data.properties) {
+                    // Format: { success: true, properties: [...] }
+                    properties = data.properties;
+                } else if (Array.isArray(data)) {
+                    // Format: [property1, property2, ...]
+                    properties = data;
+                } else if (data.properties) {
+                    // Format: { properties: [...] } (without success field)
+                    properties = data.properties;
+                }
+                
+                console.log('Properties loaded successfully:', properties);
+                displayProperties(properties);
+                
+            } catch (error) {
+                console.error('Properties load error:', error);
+                displayPropertiesError();
+            }
+        }
+
+        // Display properties
+        function displayProperties(properties) {
+            console.log('displayProperties called with:', properties);
+            
+            const propertiesGrid = document.getElementById('propertiesGrid');
+            
+            // Store properties globally so buttons can access them
+            allProperties = properties;
+            console.log('allProperties updated to:', allProperties);
+            
+            if (properties.length === 0) {
+                propertiesGrid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🏠</div>
+                        <div class="empty-state-title">No properties yet</div>
+                        <div class="empty-state-description">Add your first property to start managing inquiries and automating your workflow</div>
+                        <button class="add-property-btn" onclick="openAddPropertyModal()">Add Your First Property</button>
+                    </div>
+                `;
+                return;
+            }
+
+            propertiesGrid.innerHTML = properties.map(property => {
+                console.log('Rendering property:', property);
+                return `
+                <div class="property-card" style="position: relative;">
+                    <span class="status-badge ${property.is_active ? 'status-active' : 'status-inactive'}">
+                        ${property.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                    <div class="property-image">🏠</div>
+                    <div class="property-content">
+                        <div class="property-address">${property.address}${property.unit ? ` ${property.unit}` : ''}</div>
+                        <div class="property-details">
+                            <span>${property.bedrooms} bed</span>
+                            <span>${property.bathrooms} bath</span>
+                            ${property.square_feet ? `<span>${property.square_feet} sq ft</span>` : ''}
+                        </div>
+                        <div class="property-rent">$${property.rent ? property.rent.toLocaleString() : 'N/A'}/month</div>
+                        ${property.description ? `<div class="property-description">${property.description.substring(0, 100)}${property.description.length > 100 ? '...' : ''}</div>` : ''}
+                        <div class="property-actions">
+                            <button class="action-btn primary" onclick="window.editProperty(${property.id})">Edit</button>
+                            ${property.is_active ? 
+                                `<button class="action-btn warning" onclick="window.setPropertyStatus(${property.id}, 'hold')">Hold</button>
+                                 <button class="action-btn danger" onclick="window.setPropertyStatus(${property.id}, 'inactive')">Deactivate</button>` : 
+                                `<button class="action-btn success" onclick="window.setPropertyStatus(${property.id}, 'active')">Activate</button>`
+                            }
+                        </div>
+                    </div>
+                </div>
+            `;
+            }).join('');
+            
+            console.log('Properties rendered successfully');
+        }
+
+        // Display properties error
+        function displayPropertiesError() {
+            const propertiesGrid = document.getElementById('propertiesGrid');
+            propertiesGrid.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">⚠️</div>
+                    <div class="empty-state-title">Failed to load properties</div>
+                    <div class="empty-state-description">There was an error loading your properties. Please try again.</div>
+                    <button class="add-property-btn" onclick="loadProperties()">Retry</button>
+                </div>
+            `;
+        }
+
+        // Modal functions
+        function openAddPropertyModal() {
+            document.getElementById('addPropertyModal').classList.add('active');
+        }
+
+        function closeAddPropertyModal() {
+            document.getElementById('addPropertyModal').classList.remove('active');
+            document.getElementById('addPropertyForm').reset();
+        }
+
+        // Set property status (active, hold, inactive)
+        window.setPropertyStatus = async function(propertyId, status) {
+            console.log(`Attempting to set property ${propertyId} to status: ${status}`);
+            console.log('allProperties:', allProperties);
+            
+            const property = allProperties.find(p => p.id === propertyId);
+            if (!property) {
+                alert('Property not found');
+                console.error('Property not found:', propertyId);
+                console.error('Available properties:', allProperties);
+                return;
+            }
+
+            const statusText = status === 'active' ? 'activate' : 
+                              status === 'hold' ? 'put on hold' : 'deactivate';
+            
+            if (!confirm(`Are you sure you want to ${statusText} "${property.address}"?`)) {
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('access_token');
+                if (!token) {
+                    alert('Not authenticated. Please log in again.');
+                    window.location.href = '/login';
+                    return;
+                }
+
+                console.log('Sending request to:', `/api/properties/${propertyId}/status`);
+                console.log('Request body:', { status: status, is_active: status === 'active' });
+
+                const response = await fetch(`/api/properties/${propertyId}/status`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ 
+                        status: status,
+                        is_active: status === 'active'
+                    })
+                });
+
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    console.error('Response not OK:', response.status, response.statusText);
+                    if (response.status === 401) {
+                        alert('Session expired. Please log in again.');
+                        logout();
+                        return;
+                    }
+                    
+                    // Try to get error details
+                    let errorText = 'Unknown error';
+                    try {
+                        const errorData = await response.json();
+                        errorText = errorData.detail || errorData.message || 'Unknown error';
+                    } catch (e) {
+                        errorText = `HTTP ${response.status}: ${response.statusText}`;
+                    }
+                    
+                    throw new Error(errorText);
+                }
+
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (data.success) {
+                    // Update local property data
+                    const propertyIndex = allProperties.findIndex(p => p.id === propertyId);
+                    if (propertyIndex !== -1) {
+                        allProperties[propertyIndex].is_active = status === 'active';
+                        allProperties[propertyIndex].status = status;
+                    }
+                    
+                    // Reload properties to reflect changes
+                    await loadProperties();
+                    
+                    alert(`Property ${statusText}d successfully!`);
+                } else {
+                    throw new Error(data.message || 'Failed to update property status');
+                }
+            } catch (error) {
+                console.error('Update property status error:', error);
+                alert(`Failed to update property status: ${error.message}`);
+            }
+        }
+
+        // Edit property function
+        window.editProperty = function(propertyId) {
+            console.log(`Edit property clicked for ID: ${propertyId}`);
+            console.log('allProperties:', allProperties);
+            
+            const property = allProperties.find(p => p.id === propertyId);
+            if (!property) {
+                alert('Property not found');
+                console.error('Property not found for edit:', propertyId);
+                console.error('Available properties:', allProperties);
+                return;
+            }
+
+            console.log('Found property for editing:', property);
+
+            // Populate edit form
+            document.getElementById('editPropertyId').value = property.id;
+            document.getElementById('editAddress').value = property.address || '';
+            document.getElementById('editUnit').value = property.unit || '';
+            document.getElementById('editRent').value = property.rent || '';
+            document.getElementById('editBedrooms').value = property.bedrooms || '';
+            document.getElementById('editBathrooms').value = property.bathrooms || '';
+            document.getElementById('editSquareFeet').value = property.square_feet || '';
+            document.getElementById('editDescription').value = property.description || '';
+            document.getElementById('editAmenities').value = property.amenities || '';
+            document.getElementById('editAvailabilityDate').value = property.availability_date || '';
+            document.getElementById('editAcuityId').value = property.acuity_id || '';
+
+            // Open edit modal
+            document.getElementById('editPropertyModal').classList.add('active');
+            console.log('Edit modal opened');
+        }
+
+        // Close edit property modal
+        function closeEditPropertyModal() {
+            document.getElementById('editPropertyModal').classList.remove('active');
+            document.getElementById('editPropertyForm').reset();
+        }
+
+        // Add property form submission
+        document.getElementById('addPropertyForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Adding...';
+
+            try {
+                const formData = {
+                    address: document.getElementById('address').value.trim(),
+                    unit: document.getElementById('unit').value.trim() || null,
+                    rent: parseFloat(document.getElementById('rent').value),
+                    bedrooms: parseInt(document.getElementById('bedrooms').value),
+                    bathrooms: parseFloat(document.getElementById('bathrooms').value),
+                    square_feet: document.getElementById('squareFeet').value ? parseInt(document.getElementById('squareFeet').value) : null,
+                    description: document.getElementById('description').value.trim() || null,
+                    amenities: document.getElementById('amenities').value.trim() || null,
+                    availability_date: document.getElementById('availabilityDate').value || null,
+                    acuity_id: document.getElementById('acuityId').value.trim() || null
+                };
+
+                const token = localStorage.getItem('access_token');
+                const response = await fetch('/api/properties', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        logout();
+                        return;
+                    }
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    closeAddPropertyModal();
+                    loadProperties(); // Reload the properties list
+                } else {
+                    throw new Error(data.message || 'Failed to add property');
+                }
+            } catch (error) {
+                console.error('Add property error:', error);
+                alert('Failed to add property. Please try again.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Add Property';
+            }
+        });
+
+        // Edit property form submission
+        document.getElementById('editPropertyForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('editSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Updating...';
+
+            try {
+                const propertyId = document.getElementById('editPropertyId').value;
+                const formData = {
+                    address: document.getElementById('editAddress').value.trim(),
+                    unit: document.getElementById('editUnit').value.trim() || null,
+                    rent: parseFloat(document.getElementById('editRent').value),
+                    bedrooms: parseInt(document.getElementById('editBedrooms').value),
+                    bathrooms: parseFloat(document.getElementById('editBathrooms').value),
+                    square_feet: document.getElementById('editSquareFeet').value ? parseInt(document.getElementById('editSquareFeet').value) : null,
+                    description: document.getElementById('editDescription').value.trim() || null,
+                    amenities: document.getElementById('editAmenities').value.trim() || null,
+                    availability_date: document.getElementById('editAvailabilityDate').value || null,
+                    acuity_id: document.getElementById('editAcuityId').value.trim() || null
+                };
+
+                const token = localStorage.getItem('access_token');
+                const response = await fetch(`/api/properties/${propertyId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        logout();
+                        return;
+                    }
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    closeEditPropertyModal();
+                    loadProperties(); // Reload the properties list
+                    alert('Property updated successfully!');
+                } else {
+                    throw new Error(data.message || 'Failed to update property');
+                }
+            } catch (error) {
+                console.error('Update property error:', error);
+                alert('Failed to update property. Please try again.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Update Property';
+            }
+        });
+
+        // Placeholder functions for future implementation
+        function togglePropertyStatus(propertyId, currentStatus) {
+            // This function is now replaced by setPropertyStatus
+            alert('Use the specific status buttons (Hold, Activate, Deactivate) instead.');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('addPropertyModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddPropertyModal();
+            }
+        });
+
+        document.getElementById('editPropertyModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEditPropertyModal();
+            }
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProperties();
+        });
+    </script>
+</body>
+</html>

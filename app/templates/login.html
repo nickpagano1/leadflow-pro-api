@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - LeadFlow Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+            color: #111827;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            padding: 48px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .logo h1 {
+            font-size: 32px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+        
+        .logo p {
+            color: #6b7280;
+            font-size: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #111827;
+            box-shadow: 0 0 0 3px rgb(17 24 39 / 0.1);
+        }
+        
+        .password-field {
+            position: relative;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .remember-me input {
+            margin-right: 8px;
+        }
+        
+        .remember-me label {
+            color: #6b7280;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            background: #111827;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-bottom: 24px;
+        }
+        
+        .submit-btn:hover {
+            background: #1f2937;
+        }
+        
+        .submit-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .signup-link {
+            text-align: center;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .signup-link a {
+            color: #111827;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+        
+        .loading {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            margin-left: 8px;
+        }
+        
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ffffff40;
+            border-top: 2px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>LeadFlow Pro</h1>
+            <p>Sign in to your account</p>
+        </div>
+
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    required 
+                    value="npagano@besenpartners.com"
+                    autocomplete="email"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password *</label>
+                <div class="password-field">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        required 
+                        value="password123"
+                        autocomplete="current-password"
+                    >
+                    <button type="button" class="password-toggle" onclick="togglePassword()">Show</button>
+                </div>
+            </div>
+
+            <div class="remember-me">
+                <input type="checkbox" id="rememberMe" name="rememberMe">
+                <label for="rememberMe">Remember me</label>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+                Sign in
+                <div class="loading" id="loadingSpinner">
+                    <div class="spinner"></div>
+                </div>
+            </button>
+        </form>
+
+        <div class="signup-link">
+            Don't have an account? <a href="/signup">Sign up</a>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = document.querySelector('.password-toggle');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = 'Hide';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = 'Show';
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function hideError() {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.style.display = 'none';
+        }
+
+        function setLoading(loading) {
+            const submitBtn = document.getElementById('submitBtn');
+            const spinner = document.getElementById('loadingSpinner');
+            
+            if (loading) {
+                submitBtn.disabled = true;
+                spinner.style.display = 'flex';
+                submitBtn.textContent = '';
+                submitBtn.appendChild(spinner);
+            } else {
+                submitBtn.disabled = false;
+                spinner.style.display = 'none';
+                submitBtn.textContent = 'Sign in';
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            hideError();
+            setLoading(true);
+            
+            const formData = new FormData(e.target);
+            const email = formData.get('email');
+            const password = formData.get('password');
+            
+            try {
+                console.log('Attempting login for:', email);
+                
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+                
+                console.log('Login response status:', response.status);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Login successful:', data);
+                    
+                    // Store the token
+                    localStorage.setItem('access_token', data.access_token);
+                    localStorage.setItem('agent', JSON.stringify(data.agent));
+                    
+                    console.log('Token stored:', data.access_token);
+                    
+                    // Redirect to dashboard
+                    window.location.href = '/dashboard';
+                    
+                } else {
+                    const errorData = await response.json();
+                    console.error('Login failed:', errorData);
+                    showError(errorData.detail || 'Login failed. Please try again.');
+                }
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('Network error. Please check your connection and try again.');
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        // Check if already logged in
+        window.addEventListener('load', function() {
+            const token = localStorage.getItem('access_token');
+            if (token) {
+                console.log('Found existing token, redirecting to dashboard');
+                window.location.href = '/dashboard';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Parser Test - LeadFlow Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        .card-shadow {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-8">
+                    <h1 class="text-xl font-semibold text-gray-900">LeadFlow Pro</h1>
+                    <div class="hidden md:flex space-x-8">
+                        <a href="/dashboard" class="text-gray-500 hover:text-gray-700">Dashboard</a>
+                        <a href="/properties" class="text-gray-500 hover:text-gray-700">Properties</a>
+                        <a href="/inquiries" class="text-gray-500 hover:text-gray-700">Inquiries</a>
+                        <a href="/automation" class="text-gray-500 hover:text-gray-700">Automation</a>
+                        <a href="/calendar" class="text-gray-500 hover:text-gray-700">Calendar</a>
+                        <a href="/email-setup" class="text-gray-500 hover:text-gray-700">Email Setup</a>
+                        <a href="/email-test" class="text-blue-600 font-medium">Email Test</a>
+                        <a href="/analytics" class="text-gray-500 hover:text-gray-700">Analytics</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Email Parser Testing</h1>
+            <p class="text-gray-600 mt-2">Test how the system parses real estate inquiry emails</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Input Section -->
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Email Input</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label for="senderEmail" class="block text-sm font-medium text-gray-700 mb-2">Sender Email</label>
+                        <input type="email" id="senderEmail" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                            value="john.smith@email.com"
+                            placeholder="prospect@email.com">
+                    </div>
+                    
+                    <div>
+                        <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">Subject Line</label>
+                        <input type="text" id="subject" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                            value="Inquiry about 123 Main Street Apt 4B"
+                            placeholder="Subject line from StreetEasy/Zillow">
+                    </div>
+                    
+                    <div>
+                        <label for="emailBody" class="block text-sm font-medium text-gray-700 mb-2">Email Body</label>
+                        <textarea id="emailBody" rows="12" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Paste the actual email content here...">Hi, I'm John Smith and I'm very interested in the 2-bedroom apartment at 123 Main Street, Apt 4B.
+
+I'm looking to move ASAP and my budget is around $4,500 per month. I can be reached at (555) 123-4567.
+
+When would be a good time to schedule a viewing? I'm available this week.
+
+Thanks!
+John</textarea>
+                    </div>
+                    
+                    <button onclick="testEmailParser()" id="testBtn"
+                        class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 font-medium">
+                        Parse Email
+                    </button>
+                </div>
+                
+                <!-- Sample Email Templates -->
+                <div class="mt-8">
+                    <h4 class="font-medium text-gray-900 mb-3">Sample Email Templates</h4>
+                    <div class="space-y-2">
+                        <button onclick="loadSample('streeteasy')" 
+                            class="w-full text-left px-3 py-2 bg-blue-50 hover:bg-blue-100 rounded text-sm">
+                            📧 StreetEasy Inquiry Sample
+                        </button>
+                        <button onclick="loadSample('zillow')" 
+                            class="w-full text-left px-3 py-2 bg-green-50 hover:bg-green-100 rounded text-sm">
+                            🏠 Zillow Inquiry Sample
+                        </button>
+                        <button onclick="loadSample('urgent')" 
+                            class="w-full text-left px-3 py-2 bg-red-50 hover:bg-red-100 rounded text-sm">
+                            🚨 Urgent Inquiry Sample
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Parsed Results</h3>
+                
+                <div id="resultsContainer">
+                    <div class="text-center py-8 text-gray-500">
+                        <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <p>Click "Parse Email" to see extracted information</p>
+                    </div>
+                </div>
+                
+                <!-- Auto-Reply Preview -->
+                <div id="autoReplyPreview" class="hidden mt-6 p-4 bg-gray-50 rounded-lg">
+                    <h4 class="font-medium text-gray-900 mb-2">Generated Auto-Reply Preview</h4>
+                    <div id="autoReplyContent" class="text-sm text-gray-700 whitespace-pre-line"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sampleEmails = {
+            streeteasy: {
+                sender: "interested.renter@gmail.com",
+                subject: "StreetEasy Inquiry: 456 Broadway #3A - $5,200/month",
+                body: `From: Sarah Johnson <interested.renter@gmail.com>
+Property: 456 Broadway #3A
+Rent: $5,200/month
+
+Hi there,
+
+I saw your listing on StreetEasy for the 2-bedroom apartment at 456 Broadway #3A and I'm very interested!
+
+I'm looking for a place starting December 1st and my budget is up to $5,500 per month. I have excellent credit and can provide references.
+
+Could we schedule a viewing this week? I'm available Tuesday through Friday after 4 PM.
+
+You can reach me at (646) 555-7890 or this email.
+
+Best regards,
+Sarah Johnson`
+            },
+            zillow: {
+                sender: "mike.tenant@yahoo.com", 
+                subject: "Inquiry about your rental at 789 Columbus Ave",
+                body: `Hi,
+
+I'm Mike Chen and I found your listing on Zillow for 789 Columbus Ave, Unit 2B.
+
+I'm relocating to NYC for work and need to move ASAP (ideally within 2 weeks). My budget is flexible but preferably around $4,000-4,800/month.
+
+Phone: 917-555-0123
+Current location: Boston, MA
+Move-in: As soon as possible
+
+Can we set up a virtual tour or in-person viewing? I'm driving down this weekend and could see it then.
+
+Thanks!
+Mike`
+            },
+            urgent: {
+                sender: "emergency.housing@hotmail.com",
+                subject: "URGENT: Need apartment ASAP - saw your listing",
+                body: `Hello,
+
+This is Jennifer Lopez and I'm in an urgent housing situation. My current lease ends this Friday and I need to find a place immediately.
+
+I saw your apartment listing and it looks perfect. I can pay first month, last month, and security deposit upfront. My budget is up to $6,000/month.
+
+PLEASE call me ASAP at (212) 555-9999. I'm available 24/7 and can see the apartment today or tomorrow.
+
+I have:
+- Excellent credit (750+ score)
+- Stable income ($120k/year)
+- Clean background
+- Previous landlord references
+
+Time sensitive - please respond today!
+
+Jennifer Lopez
+jennifer.lopez.housing@hotmail.com
+(212) 555-9999`
+            }
+        };
+
+        function loadSample(type) {
+            const sample = sampleEmails[type];
+            document.getElementById('senderEmail').value = sample.sender;
+            document.getElementById('subject').value = sample.subject;
+            document.getElementById('emailBody').value = sample.body;
+        }
+
+        async function testEmailParser() {
+            const testBtn = document.getElementById('testBtn');
+            const originalText = testBtn.innerHTML;
+            
+            testBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Parsing...';
+            testBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/email/test-parser', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        sender_email: document.getElementById('senderEmail').value,
+                        subject: document.getElementById('subject').value,
+                        body: document.getElementById('emailBody').value
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    displayResults(result.parsed_data);
+                    generateAutoReplyPreview(result.parsed_data);
+                } else {
+                    showError(result.error || 'Error parsing email');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Network error occurred');
+            } finally {
+                testBtn.innerHTML = originalText;
+                testBtn.disabled = false;
+            }
+        }
+
+        function displayResults(data) {
+            const container = document.getElementById('resultsContainer');
+            
+            const urgencyColor = data.urgency_score >= 8 ? 'bg-red-100 text-red-800' :
+                               data.urgency_score >= 6 ? 'bg-yellow-100 text-yellow-800' :
+                               'bg-green-100 text-green-800';
+
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-3 bg-blue-50 rounded-lg">
+                            <div class="text-xs text-blue-600 font-medium">PROSPECT NAME</div>
+                            <div class="text-sm font-semibold text-blue-900">${data.prospect_name || 'Not found'}</div>
+                        </div>
+                        <div class="p-3 bg-green-50 rounded-lg">
+                            <div class="text-xs text-green-600 font-medium">EMAIL</div>
+                            <div class="text-sm font-semibold text-green-900">${data.prospect_email}</div>
+                        </div>
+                        <div class="p-3 bg-purple-50 rounded-lg">
+                            <div class="text-xs text-purple-600 font-medium">PHONE</div>
+                            <div class="text-sm font-semibold text-purple-900">${data.prospect_phone || 'Not found'}</div>
+                        </div>
+                        <div class="p-3 ${urgencyColor} rounded-lg">
+                            <div class="text-xs font-medium">URGENCY SCORE</div>
+                            <div class="text-sm font-semibold">${data.urgency_score}/10</div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-3 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-600 font-medium mb-1">PROPERTY INFO</div>
+                        <div class="text-sm font-semibold text-gray-900">${data.property_info}</div>
+                    </div>
+                    
+                    ${data.budget ? `
+                    <div class="p-3 bg-yellow-50 rounded-lg">
+                        <div class="text-xs text-yellow-600 font-medium mb-1">BUDGET</div>
+                        <div class="text-sm font-semibold text-yellow-900">${data.budget}</div>
+                    </div>
+                    ` : ''}
+                    
+                    ${data.timeline ? `
+                    <div class="p-3 bg-orange-50 rounded-lg">
+                        <div class="text-xs text-orange-600 font-medium mb-1">TIMELINE</div>
+                        <div class="text-sm font-semibold text-orange-900">${data.timeline}</div>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="p-3 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-600 font-medium mb-1">EXTRACTED MESSAGE</div>
+                        <div class="text-sm text-gray-900">${data.message}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateAutoReplyPreview(data) {
+            const previewDiv = document.getElementById('autoReplyPreview');
+            const contentDiv = document.getElementById('autoReplyContent');
+            
+            const prospectName = data.prospect_name !== 'Prospective Tenant' ? data.prospect_name : 'Hi there';
+            const timelineText = data.timeline === 'ASAP' ? 
+                " I understand you're looking to move soon, so let's get you scheduled right away!" :
+                data.timeline ? ` I see you're looking to move ${data.timeline} - perfect timing!` : '';
+            
+            const budgetText = data.budget ? ` The ${data.budget} budget you mentioned works well for this property.` : '';
+            
+            const autoReply = `Subject: Re: Your inquiry about ${data.property_info}
+
+Hi ${prospectName},
+
+Thank you for your interest in ${data.property_info}!${timelineText}
+
+I'd love to schedule a viewing for you at your convenience.${budgetText}
+
+📅 Book a viewing instantly: [BOOKING_LINK]
+📱 Call/text me directly: (555) 123-4567
+🏠 Virtual tour available: [VIRTUAL_TOUR_LINK]
+
+The property has been getting a lot of interest, so I'd recommend scheduling sooner rather than later to secure your preferred time slot.
+
+Looking forward to showing you the space!
+
+Best regards,
+Your Agent Name
+Real Estate Professional
+agent@leadflow.pro
+
+P.S. If you have any specific questions about the property, neighborhood, or application process, feel free to call me directly!`;
+
+            contentDiv.textContent = autoReply;
+            previewDiv.classList.remove('hidden');
+        }
+
+        function showError(message) {
+            const container = document.getElementById('resultsContainer');
+            container.innerHTML = `
+                <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <div class="flex">
+                        <svg class="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div class="text-sm text-red-700">${message}</div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

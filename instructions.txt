@@ -1,0 +1,15 @@
+"Deploy my complete LeadFlow Pro API to production server at /var/www/leadflow-api with these requirements:
+1. Create server.js with complete API including:
+
+MongoDB integration with connection string: mongodb+srv://npagano:INnJcMOnDSKMJgT7@leadflow-production.ga7etbp.mongodb.net/?retryWrites=true&w=majority&appName=leadflow-production
+All authentication endpoints (register/login)
+Email configuration endpoints
+Automation endpoints (scan/send)
+User profile and stats endpoints
+Port 80 binding with '0.0.0.0'
+Production error handling and security
+
+2. Create .env file with production configuration
+3. Ensure package.json has all required dependencies
+4. Test the server can start without errors
+The server should be accessible at reflows.app domain and include full database integration."

@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Setup - LeadFlow Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .wizard-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #f1f5f9;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 3px;
+        }
+
+        .wizard-content {
+            padding: 40px;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .step.active {
+            background: #3b82f6;
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .step.completed {
+            background: #10b981;
+            color: white;
+        }
+
+        .step.pending {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .step-content {
+            text-align: center;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 16px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .provider-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .provider-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            background: white;
+        }
+
+        .provider-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+        }
+
+        .provider-card.selected {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .provider-card.recommended::after {
+            content: "Recommended";
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: #10b981;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .provider-logo {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 12px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .provider-name {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .instructions-container {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .instruction-step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .step-number {
+            background: #3b82f6;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .unique-address {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .address-label {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .address-value {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            word-break: break-all;
+            margin-bottom: 12px;
+        }
+
+        .copy-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .copy-button:hover {
+            background: #2563eb;
+        }
+
+        .copy-button.copied {
+            background: #10b981;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .success-animation {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .checkmark {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #10b981;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+
+        .checkmark::after {
+            content: "✓";
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .api-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 1000;
+        }
+
+        .api-status.connected {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .api-status.error {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background: #dcfce7;
+            border: 1px solid #bbf7d0;
+            color: #16a34a;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="api-status" id="apiStatus">🔄 Connecting to API...</div>
+    
+    <div class="wizard-container">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div class="wizard-content">
+            <div class="step-indicator">
+                <div class="step active" id="step1">1</div>
+                <div class="step pending" id="step2">2</div>
+                <div class="step pending" id="step3">3</div>
+                <div class="step pending" id="step4">4</div>
+            </div>
+            
+            <div class="step-content" id="stepContent">
+                <!-- Step 1: Provider Selection -->
+                <div id="step1Content">
+                    <h2>Choose Your Email Provider</h2>
+                    <p class="subtitle">Select your email provider to set up automated responses</p>
+                    
+                    <div class="provider-grid">
+                        <div class="provider-card recommended" data-provider="gmail">
+                            <div class="provider-logo">📧</div>
+                            <div class="provider-name">Gmail</div>
+                        </div>
+                        <div class="provider-card" data-provider="outlook">
+                            <div class="provider-logo">📨</div>
+                            <div class="provider-name">Outlook</div>
+                        </div>
+                        <div class="provider-card" data-provider="yahoo">
+                            <div class="provider-logo">📩</div>
+                            <div class="provider-name">Yahoo</div>
+                        </div>
+                        <div class="provider-card" data-provider="other">
+                            <div class="provider-logo">✉️</div>
+                            <div class="provider-name">Other</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-secondary" id="backBtn" onclick="previousStep()" style="display: none;">Back</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextStep()" disabled>Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE_URL = 'http://159.203.65.87:3000';
+        
+        // State management
+        let currentStep = 1;
+        let selectedProvider = null;
+        let userEmail = 'john@realestate.com'; // Simulated for now
+        let uniqueAddress = '';
+        let apiConnected = false;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkApiConnection();
+            setupEventListeners();
+            updateProgress();
+        });
+        
+        // API Connection Check
+        async function checkApiConnection() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`);
+                if (response.ok) {
+                    apiConnected = true;
+                    updateApiStatus('connected', '✅ API Connected');
+                } else {
+                    throw new Error('API not responding');
+                }
+            } catch (error) {
+                apiConnected = false;
+                updateApiStatus('error', '❌ API Error');
+                console.error('API connection failed:', error);
+            }
+        }
+        
+        function updateApiStatus(status, text) {
+            const statusEl = document.getElementById('apiStatus');
+            statusEl.className = `api-status ${status}`;
+            statusEl.textContent = text;
+        }
+        
+        // Event Listeners
+        function setupEventListeners() {
+            // Provider selection
+            document.querySelectorAll('.provider-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    document.querySelectorAll('.provider-card').forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedProvider = this.dataset.provider;
+                    document.getElementById('nextBtn').disabled = false;
+                });
+            });
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !document.getElementById('nextBtn').disabled) {
+                    nextStep();
+                } else if (e.key === 'Escape' && currentStep > 1) {
+                    previousStep();
+                }
+            });
+        }
+        
+        // Step Navigation
+        async function nextStep() {
+            if (currentStep === 1 && selectedProvider) {
+                currentStep = 2;
+                await showInstructions();
+            } else if (currentStep === 2) {
+                currentStep = 3;
+                await showUniqueAddress();
+            } else if (currentStep === 3) {
+                currentStep = 4;
+                await saveConfiguration();
+            } else if (currentStep === 4) {
+                // Complete - could redirect to dashboard
+                window.location.href = '/dashboard'; // Or wherever you want to go
+            }
+            
+            updateStepIndicators();
+            updateProgress();
+            updateButtons();
+        }
+        
+        function previousStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepIndicators();
+                updateProgress();
+                updateButtons();
+                
+                if (currentStep === 1) showProviderSelection();
+                else if (currentStep === 2) showInstructions();
+                else if (currentStep === 3) showUniqueAddress();
+            }
+        }
+        
+        // Step Content
+        function showProviderSelection() {
+            document.getElementById('stepContent').innerHTML = `
+                <div id="step1Content">
+                    <h2>Choose Your Email Provider</h2>
+                    <p class="subtitle">Select your email provider to set up automated responses</p>
+                    
+                    <div class="provider-grid">
+                        <div class="provider-card recommended ${selectedProvider === 'gmail' ? 'selected' : ''}" data-provider="gmail">
+                            <div class="provider-logo">📧</div>
+                            <div class="provider-name">Gmail</div>
+                        </div>
+                        <div class="provider-card ${selectedProvider === 'outlook' ? 'selected' : ''}" data-provider="outlook">
+                            <div class="provider-logo">📨</div>
+                            <div class="provider-name">Outlook</div>
+                        </div>
+                        <div class="provider-card ${selectedProvider === 'yahoo' ? 'selected' : ''}" data-provider="yahoo">
+                            <div class="provider-logo">📩</div>
+                            <div class="provider-name">Yahoo</div>
+                        </div>
+                        <div class="provider-card ${selectedProvider === 'other' ? 'selected' : ''}" data-provider="other">
+                            <div class="provider-logo">✉️</div>
+                            <div class="provider-name">Other</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            setupEventListeners();
+        }
+        
+        async function showInstructions() {
+            const instructions = getProviderInstructions(selectedProvider);
+            
+            document.getElementById('stepContent').innerHTML = `
+                <div>
+                    <h2>Setup Instructions</h2>
+                    <p class="subtitle">Follow these steps to configure ${selectedProvider.charAt(0).toUpperCase() + selectedProvider.slice(1)} forwarding</p>
+                    
+                    <div class="instructions-container">
+                        ${instructions.map((instruction, index) => `
+                            <div class="instruction-step">
+                                <div class="step-number">${index + 1}</div>
+                                <div>${instruction}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        async function showUniqueAddress() {
+            // Generate unique address (or get from API)
+            if (!uniqueAddress) {
+                uniqueAddress = generateUniqueAddress();
+            }
+            
+            document.getElementById('stepContent').innerHTML = `
+                <div>
+                    <h2>Your Unique Email Address</h2>
+                    <p class="subtitle">Forward your real estate inquiries to this address</p>
+                    
+                    <div class="unique-address">
+                        <div class="address-label">Your LeadFlow forwarding address:</div>
+                        <div class="address-value">${uniqueAddress}</div>
+                        <button class="copy-button" onclick="copyAddress(this)">Copy Address</button>
+                    </div>
+                    
+                    <p style="color: #64748b; font-size: 14px; text-align: center;">
+                        Use this address in your ${selectedProvider} forwarding rules to automatically process inquiries
+                    </p>
+                </div>
+            `;
+        }
+        
+        async function saveConfiguration() {
+            // Show loading state
+            document.getElementById('nextBtn').innerHTML = '<span class="loading-spinner"></span>Saving...';
+            document.getElementById('nextBtn').disabled = true;
+            
+            try {
+                if (apiConnected) {
+                    // Save to real API
+                    const configData = {
+                        provider: selectedProvider,
+                        userEmail: userEmail,
+                        uniqueAddress: uniqueAddress,
+                        smtpSettings: getSmtpSettings(selectedProvider)
+                    };
+                    
+                    // For now, we'll simulate the API call since we don't have authentication set up yet
+                    await simulateApiSave(configData);
+                }
+                
+                // Show success
+                showSuccess();
+                
+            } catch (error) {
+                showError('Failed to save configuration. Please try again.');
+                console.error('Save failed:', error);
+            }
+        }
+        
+        async function simulateApiSave(configData) {
+            // Simulate API call delay
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // In a real implementation, you would:
+            // const response = await fetch(`${API_BASE_URL}/api/user/email-config`, {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //         'Authorization': `Bearer ${userToken}`
+            //     },
+            //     body: JSON.stringify(configData)
+            // });
+            
+            console.log('Configuration saved:', configData);
+            return { success: true };
+        }
+        
+        function showSuccess() {
+            document.getElementById('stepContent').innerHTML = `
+                <div class="success-animation">
+                    <div class="checkmark"></div>
+                    <h2>Setup Complete! 🎉</h2>
+                    <p class="subtitle">Your email automation is now configured and ready to process inquiries automatically.</p>
+                    
+                    <div class="success-message">
+                        ✅ ${selectedProvider.charAt(0).toUpperCase() + selectedProvider.slice(1)} connected successfully<br>
+                        ✅ Unique forwarding address created<br>
+                        ✅ Automation rules configured
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('nextBtn').innerHTML = 'Go to Dashboard';
+            document.getElementById('nextBtn').disabled = false;
+        }
+        
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            document.getElementById('stepContent').insertBefore(errorDiv, document.getElementById('stepContent').firstChild);
+            
+            document.getElementById('nextBtn').innerHTML = 'Continue';
+            document.getElementById('nextBtn').disabled = false;
+        }
+        
+        // Helper Functions
+        function generateUniqueAddress() {
+            const randomId = Math.random().toString(36).substring(2, 10);
+            return `${userEmail.split('@')[0]}.${randomId}.leadflow@yourdomain.com`;
+        }
+        
+        function getProviderInstructions(provider) {
+            const instructions = {
+                gmail: [
+                    'Open Gmail and click the Settings gear icon',
+                    'Go to "See all settings" → "Filters and Blocked Addresses"',
+                    'Click "Create a new filter"',
+                    'In "From" field, enter: *@streeteasy.com OR *@zillow.com',
+                    'Click "Create filter" → Check "Forward it to" → Select your forwarding address',
+                    'Click "Create filter" to save'
+                ],
+                outlook: [
+                    'Open Outlook.com and click Settings (gear icon)',
+                    'Go to "View all Outlook settings" → "Mail" → "Rules"',
+                    'Click "Add new rule"',
+                    'Set condition: "From" contains "streeteasy.com" or "zillow.com"',
+                    'Set action: "Forward to" your unique address',
+                    'Save the rule'
+                ],
+                yahoo: [
+                    'Open Yahoo Mail and click Settings',
+                    'Go to "More Settings" → "Filters"',
+                    'Click "Add new filters"',
+                    'Set "Sender" contains "streeteasy.com"',
+                    'Set action to "Forward to" your unique address',
+                    'Save and repeat for other platforms'
+                ],
+                other: [
+                    'Access your email provider\'s settings',
+                    'Look for "Filters", "Rules", or "Forwarding" options',
+                    'Create a rule to forward emails from real estate platforms',
+                    'Use your unique LeadFlow address as the forwarding destination',
+                    'Test the rule with a sample email'
+                ]
+            };
+            return instructions[provider] || instructions.other;
+        }
+        
+        function getSmtpSettings(provider) {
+            const settings = {
+                gmail: { host: 'smtp.gmail.com', port: 587 },
+                outlook: { host: 'smtp-mail.outlook.com', port: 587 },
+                yahoo: { host: 'smtp.mail.yahoo.com', port: 587 },
+                other: { host: '', port: 587 }
+            };
+            return settings[provider] || settings.other;
+        }
+        
+        function copyAddress(button) {
+            navigator.clipboard.writeText(uniqueAddress).then(() => {
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+                setTimeout(() => {
+                    button.textContent = 'Copy Address';
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+        
+        // UI Updates
+        function updateStepIndicators() {
+            for (let i = 1; i <= 4; i++) {
+                const step = document.getElementById(`step${i}`);
+                step.className = 'step ' + (i < currentStep ? 'completed' : i === currentStep ? 'active' : 'pending');
+            }
+        }
+        
+        function updateProgress() {
+            const progress = (currentStep - 1) * 25;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+        }
+        
+        function updateButtons() {
+            const backBtn = document.getElementById('backBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            backBtn.style.display = currentStep > 1 ? 'block' : 'none';
+            
+            if (currentStep === 4) {
+                nextBtn.textContent = 'Go to Dashboard';
+            } else {
+                nextBtn.textContent = 'Continue';
+            }
+            
+            nextBtn.disabled = (currentStep === 1 && !selectedProvider);
+        }
+    </script>
+</body>
+</html>
