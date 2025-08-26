@@ -798,6 +798,27 @@ app.post('/api/scan/leads', authenticateToken, async (req, res) => {
   }
 });
 
+// Homepage route
+app.get('/', (req, res) => {
+  res.json({
+    name: 'LeadFlow Pro API',
+    version: '1.0.0',
+    status: 'Live',
+    endpoints: {
+      health: '/api/health',
+      auth: {
+        register: 'POST /api/auth/register',
+        login: 'POST /api/auth/login'
+      },
+      leads: 'GET/POST /api/leads',
+      campaigns: 'GET/POST /api/campaigns',
+      email: '/api/email/config',
+      stats: '/api/stats'
+    },
+    documentation: 'https://api.reflows.app/api/health'
+  });
+});
+
 // Global error handler
 app.use((error, req, res, next) => {
   console.error('Unhandled error:', error);
