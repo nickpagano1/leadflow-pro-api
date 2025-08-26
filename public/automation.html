@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automation - LeadFlow Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #000000;
+            --secondary-color: #666666;
+            --border-color: #e5e5e5;
+            --bg-light: #fafafa;
+            --bg-white: #ffffff;
+            --text-primary: #000000;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --radius: 8px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-light);
+        }
+
+        /* Navigation - Same as Properties */
+        .navbar {
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 400;
+            font-size: 14px;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--text-primary);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-info {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .logout-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        /* Automation Performance Stats */
+        .automation-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 24px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Two-Click Email Automation - Using exact same design patterns */
+        .two-click-automation {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 40px;
+            transition: all 0.2s ease;
+        }
+
+        .two-click-automation:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .automation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .automation-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .automation-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .automation-actions {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .automation-btn {
+            background: var(--text-primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .automation-btn:hover {
+            background: var(--secondary-color);
+        }
+
+        .automation-btn:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        .automation-btn.secondary {
+            background: var(--bg-light);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .automation-btn.secondary:hover {
+            background: var(--text-primary);
+            color: white;
+        }
+
+        .progress-container {
+            display: none;
+            margin-bottom: 24px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-light);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--success-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .pending-emails {
+            display: none;
+        }
+
+        .pending-email-item {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .email-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .email-subject {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .platform-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .platform-streeteasy {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .platform-zillow {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        .email-preview {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .agent-input-section {
+            display: none;
+            margin-top: 12px;
+        }
+
+        .agent-input-label {
+            font-size: 12px;
+            color: var(--text-primary);
+            font-weight: 500;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .agent-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .agent-input.invalid {
+            border-color: var(--error-color);
+        }
+
+        .question-list {
+            margin-bottom: 8px;
+        }
+
+        .question-item {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: inline-block;
+            margin-right: 8px;
+            margin-bottom: 4px;
+        }
+
+        /* Automation Settings */
+        .automation-settings {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .setting-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 24px;
+            transition: all 0.2s ease;
+        }
+
+        .setting-card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .setting-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .setting-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .setting-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .setting-btn {
+            background: var(--bg-light);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .setting-btn:hover {
+            background: var(--text-primary);
+            color: white;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 26px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--text-primary);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Property Status Overview */
+        .properties-section {
+            margin-top: 40px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+        }
+
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .property-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .property-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .property-image {
+            height: 200px;
+            background: var(--bg-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 48px;
+        }
+
+        .property-content {
+            padding: 20px;
+        }
+
+        .property-address {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .property-details {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .property-rent {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .automation-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            position: absolute;
+            top: 12px;
+            right: 12px;
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-inactive {
+            background: rgba(107, 114, 128, 0.1);
+            color: var(--text-muted);
+        }
+
+        /* Email Preview Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--bg-white);
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            margin: 20px;
+        }
+
+        .modal-header {
+            padding: 24px 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 4px;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .email-preview-content {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 20px;
+            font-family: Georgia, serif;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        /* Success Modal */
+        .success-modal {
+            background: var(--bg-white);
+            border-radius: var(--radius);
+            padding: 32px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            max-width: 400px;
+            margin: 20px;
+        }
+
+        .success-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .success-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .success-message {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .success-stats {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .success-stat {
+            text-align: center;
+        }
+
+        .success-stat-number {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--success-color);
+            margin-bottom: 4px;
+        }
+
+        .success-stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .success-btn {
+            background: var(--text-primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .success-btn:hover {
+            background: var(--secondary-color);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-secondary);
+            grid-column: 1 / -1;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 24px;
+            opacity: 0.5;
+        }
+
+        .empty-state-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .empty-state-description {
+            font-size: 16px;
+            margin-bottom: 24px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .automation-stats {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+
+            .automation-settings {
+                grid-template-columns: 1fr;
+            }
+
+            .properties-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-container {
+                padding: 20px 16px;
+            }
+
+            .automation-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">LeadFlow Pro</a>
+            <ul class="nav-links">
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="/properties">Properties</a></li>
+                <li><a href="/inquiries">Inquiries</a></li>
+                <li><a href="/automation" class="active">Automation</a></li>
+                <li><a href="/analytics">Analytics</a></li>
+            </ul>
+            <div class="user-menu">
+                <span class="user-info" id="userInfo">Loading...</span>
+                <button class="logout-btn" onclick="logout()">Sign out</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Automation</h1>
+                <p class="page-subtitle">Configure and manage your lead automation workflows</p>
+            </div>
+        </div>
+
+        <!-- Automation Performance Stats -->
+        <div class="automation-stats">
+            <div class="stat-card">
+                <div class="stat-number" id="emailsSent">0</div>
+                <div class="stat-label">Emails Sent</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="responseRate">0%</div>
+                <div class="stat-label">Response Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activePropertiesCount">0</div>
+                <div class="stat-label">Active Properties</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="toursScheduled">0</div>
+                <div class="stat-label">Tours Scheduled</div>
+            </div>
+        </div>
+
+        <!-- Email Automation -->
+        <div class="two-click-automation">
+            <div class="automation-header">
+                <div class="automation-title">Email Automation</div>
+            </div>
+            <div class="automation-description">
+                Scan for new inquiries and send personalized responses instantly. Our AI detects questions and prepares professional emails for your review.
+            </div>
+            
+            <div class="automation-actions">
+                <button class="automation-btn" id="scanBtn" onclick="startScan()">
+                    SCAN FOR INQUIRIES
+                </button>
+                <button class="automation-btn secondary" id="sendBtn" onclick="sendAllEmails()" disabled>
+                    SEND ALL
+                </button>
+            </div>
+
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Scanning...</div>
+            </div>
+
+            <div class="pending-emails" id="pendingEmails">
+                <!-- Pending emails will be populated here -->
+            </div>
+        </div>
+
+        <!-- Automation Settings -->
+        <div class="automation-settings">
+            <div class="setting-card">
+                <div class="setting-header">
+                    <div class="setting-title">Email Auto-Response</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-description">
+                    Automatically respond to property inquiries with personalized emails including property details and scheduling links.
+                </div>
+                <button class="setting-btn" onclick="configureEmailTemplates()">Configure Email Templates</button>
+            </div>
+
+            <div class="setting-card">
+                <div class="setting-header">
+                    <div class="setting-title">Calendar Integration</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-description">
+                    Sync with Acuity Scheduling to automatically manage property showing appointments and availability.
+                </div>
+                <button class="setting-btn" onclick="configureCalendarSettings()">Configure Calendar Settings</button>
+            </div>
+        </div>
+
+        <!-- Property Status Overview -->
+        <div class="properties-section">
+            <h2 class="section-title">Property Status Overview</h2>
+            <div class="properties-grid" id="propertiesGrid">
+                <div class="empty-state">
+                    <div class="empty-state-icon">Building</div>
+                    <div class="empty-state-title">Loading properties...</div>
+                    <div class="empty-state-description">Please wait while we load your property automation settings</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Preview Modal -->
+    <div class="modal" id="emailPreviewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalPropertyTitle">Email Preview</h3>
+                <button class="close-btn" onclick="closeEmailPreview()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="email-preview-content" id="emailPreviewContent">
+                    <!-- Email content will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="success-modal">
+            <div class="success-icon">Success</div>
+            <div class="success-title">Emails Sent Successfully!</div>
+            <div class="success-message" id="successMessage">All emails have been sent to your prospects.</div>
+            <div class="success-stats">
+                <div class="success-stat">
+                    <div class="success-stat-number" id="successEmailCount">0</div>
+                    <div class="success-stat-label">Emails Sent</div>
+                </div>
+                <div class="success-stat">
+                    <div class="success-stat-number" id="successTimeSaved">0</div>
+                    <div class="success-stat-label">Minutes Saved</div>
+                </div>
+            </div>
+            <button class="success-btn" onclick="closeSuccessModal()">Continue</button>
+        </div>
+    </div>
+
+    <script>
+        let properties = [];
+        let pendingEmailsData = [];
+        let scanOperation = null;
+        let sendOperation = null;
+
+        // Configuration object
+        const CONFIG = Object.freeze({
+            API_TIMEOUT: 30000,
+            MAX_RETRIES: 3,
+            RATE_LIMIT_DELAY: 1000,
+            MAX_EMAIL_LENGTH: 10000,
+            MIN_AGENT_INPUT_LENGTH: 10,
+            SECURITY_CHECK_INTERVAL: 30000,
+            SESSION_TIMEOUT: 3600000
+        });
+
+        // Security Manager
+        class SecurityManager {
+            static sanitizeInput(input) {
+                if (typeof input !== 'string') return '';
+                return input
+                    .replace(/[<>]/g, '')
+                    .replace(/javascript:/gi, '')
+                    .replace(/data:/gi, '')
+                    .trim()
+                    .substring(0, CONFIG.MAX_EMAIL_LENGTH);
+            }
+
+            static validateSession() {
+                const token = localStorage.getItem('access_token');
+                if (!token) return false;
+                
+                try {
+                    // Basic JWT validation
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    const now = Date.now() / 1000;
+                    if (payload.exp && payload.exp < now) {
+                        console.log('Token expired');
+                        return false;
+                    }
+                    return true;
+                } catch (e) {
+                    console.error('Token validation failed:', e);
+                    return false;
+                }
+            }
+        }
+
+        // Email Validator
+        class EmailValidator {
+            static validateEmailStructure(email) {
+                const errors = [];
+                
+                if (!email || typeof email !== 'object') {
+                    errors.push('Invalid email object');
+                    return { valid: false, errors };
+                }
+
+                if (!email.id) errors.push('Missing email ID');
+                if (!email.subject || email.subject.length < 5) errors.push('Invalid subject');
+                if (!email.content || email.content.length < 20) errors.push('Content too short');
+                if (!email.platform) errors.push('Missing platform');
+
+                // Agent input validation
+                if (email.needsAgentInput && (!email.agentInput || email.agentInput.length < CONFIG.MIN_AGENT_INPUT_LENGTH)) {
+                    errors.push('Agent input required (minimum 10 characters)');
+                }
+
+                return { valid: errors.length === 0, errors };
+            }
+
+            static validateBatch(emails) {
+                const results = emails.map(email => this.validateEmailStructure(email));
+                const validEmails = results.filter(r => r.valid).length;
+                const invalidEmails = results.filter(r => !r.valid);
+                
+                return {
+                    total: emails.length,
+                    valid: validEmails,
+                    invalid: invalidEmails.length,
+                    errors: invalidEmails.map(r => r.errors).flat()
+                };
+            }
+        }
+
+        // API Manager
+        class APIManager {
+            static async makeRequest(url, options = {}) {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), CONFIG.API_TIMEOUT);
+
+                try {
+                    const token = localStorage.getItem('access_token');
+                    const response = await fetch(url, {
+                        ...options,
+                        signal: controller.signal,
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json',
+                            ...options.headers
+                        }
+                    });
+
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) {
+                        if (response.status === 401) {
+                            logout();
+                            throw new Error('Authentication failed');
+                        }
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    return await response.json();
+                } catch (error) {
+                    clearTimeout(timeoutId);
+                    if (error.name === 'AbortError') {
+                        throw new Error('Request timeout');
+                    }
+                    throw error;
+                }
+            }
+
+            static async scanEmails() {
+                return this.makeRequest('/api/automation/scan', { method: 'POST' });
+            }
+
+            static async sendEmails(emails) {
+                return this.makeRequest('/api/automation/send', {
+                    method: 'POST',
+                    body: JSON.stringify({ emails })
+                });
+            }
+        }
+
+        // Error Manager
+        class ErrorManager {
+            static showError(message, context = '') {
+                console.error(`Error ${context}:`, message);
+                
+                // Create and show error modal
+                const modal = document.createElement('div');
+                modal.className = 'modal active';
+                modal.innerHTML = `
+                    <div class="modal-content" style="max-width: 400px;">
+                        <div class="modal-header">
+                            <h3 class="modal-title">Error</h3>
+                            <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <p style="color: var(--text-secondary); margin-bottom: 16px;">${message}</p>
+                            <button class="automation-btn" onclick="this.closest('.modal').remove()">OK</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    if (modal.parentNode) modal.remove();
+                }, 5000);
+            }
+
+            static handleNetworkError(error) {
+                if (error.message.includes('timeout')) {
+                    this.showError('Request timed out. Please check your connection and try again.');
+                } else if (error.message.includes('Authentication')) {
+                    this.showError('Session expired. Please log in again.');
+                } else {
+                    this.showError('Network error occurred. Please try again.');
+                }
+            }
+        }
+
+        // Check authentication
+        function checkAuth() {
+            if (!SecurityManager.validateSession()) {
+                console.log('Invalid session');
+                window.location.href = '/login';
+                return false;
+            }
+            return true;
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('agent_id');
+            localStorage.removeItem('agent_name');
+            localStorage.removeItem('email');
+            window.location.href = '/login';
+        }
+
+        // Start scan operation
+        async function startScan() {
+            if (!checkAuth()) return;
+
+            const scanBtn = document.getElementById('scanBtn');
+            const sendBtn = document.getElementById('sendBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+
+            try {
+                // Reset UI
+                scanBtn.disabled = true;
+                sendBtn.disabled = true;
+                sendBtn.textContent = '📤 SEND ALL';
+                progressContainer.style.display = 'block';
+                document.getElementById('pendingEmails').style.display = 'none';
+
+                // Create operation tracker
+                scanOperation = {
+                    id: Date.now(),
+                    cancelled: false
+                };
+
+                // Simulate realistic progress
+                const steps = [
+                    { progress: 20, text: 'Connecting to email servers...' },
+                    { progress: 40, text: 'Scanning StreetEasy inquiries...' },
+                    { progress: 60, text: 'Scanning Zillow inquiries...' },
+                    { progress: 80, text: 'Detecting questions and duplicates...' },
+                    { progress: 95, text: 'Generating email responses...' },
+                    { progress: 100, text: 'Scan complete!' }
+                ];
+
+                for (let i = 0; i < steps.length; i++) {
+                    if (scanOperation.cancelled) return;
+                    
+                    const step = steps[i];
+                    progressFill.style.width = `${step.progress}%`;
+                    progressText.textContent = step.progress === 100 ? step.text : `${step.text} ${step.progress}%`;
+                    
+                    // Variable delay for realism
+                    const delay = 800 + Math.random() * 600;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+
+                // Process real scanned emails
+                await processScannedEmails();
+
+                // Update UI
+                scanBtn.disabled = false;
+                scanBtn.textContent = 'SCAN AGAIN';
+                updateSendButtonState();
+                progressContainer.style.display = 'none';
+                document.getElementById('pendingEmails').style.display = 'block';
+
+            } catch (error) {
+                ErrorManager.handleNetworkError(error);
+                resetScanState();
+            }
+        }
+
+        // Process real scanned emails
+        async function processScannedEmails() {
+            try {
+                // Make real API call to scan for emails
+                const data = await APIManager.scanEmails();
+                
+                if (data.success && data.emails) {
+                    pendingEmailsData = data.emails.map(email => ({
+                        id: email.id,
+                        subject: email.subject,
+                        platform: email.platform,
+                        preview: email.preview,
+                        content: email.content,
+                        needsAgentInput: email.needsAgentInput || false,
+                        questions: email.questions || [],
+                        confidence: email.confidence || 90,
+                        agentInput: ''
+                    }));
+                } else {
+                    pendingEmailsData = [];
+                }
+
+                displayPendingEmails();
+                
+            } catch (error) {
+                console.error('Error processing scanned emails:', error);
+                pendingEmailsData = [];
+                displayPendingEmails();
+                ErrorManager.showError('Failed to scan emails. Please try again.');
+            }
+        }
+
+
+
+        // Display pending emails
+        function displayPendingEmails() {
+            const container = document.getElementById('pendingEmails');
+            
+            if (!pendingEmailsData || pendingEmailsData.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px;">No new inquiries found.</p>';
+                return;
+            }
+
+            container.innerHTML = pendingEmailsData.map(email => `
+                <div class="pending-email-item" data-email-id="${email.id}">
+                    <div class="email-header">
+                        <div class="email-subject">${SecurityManager.sanitizeInput(email.subject)}</div>
+                        <span class="platform-badge platform-${email.platform.toLowerCase()}">${email.platform}</span>
+                    </div>
+                    <div class="email-preview">${SecurityManager.sanitizeInput(email.preview)}</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 12px; color: var(--success-color);">Confidence: ${email.confidence}%</span>
+                        <button onclick="previewEmail(${email.id})" style="background: none; border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">Preview</button>
+                    </div>
+                    ${email.needsAgentInput ? `
+                        <div class="question-list">
+                            ${email.questions.map(q => `<span class="question-item">${SecurityManager.sanitizeInput(q)}</span>`).join('')}
+                        </div>
+                        <div class="agent-input-section" style="display: block;">
+                            <label class="agent-input-label">Agent Response Required:</label>
+                            <textarea class="agent-input" placeholder="Answer the questions above in 1-2 sentences..." 
+                                      onkeyup="validateAgentInput(${email.id}, this.value)"
+                                      data-email-id="${email.id}"></textarea>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Validate agent input
+        function validateAgentInput(emailId, value) {
+            const email = pendingEmailsData.find(e => e.id === emailId);
+            const textarea = document.querySelector(`textarea[data-email-id="${emailId}"]`);
+            
+            if (!email || !textarea) return;
+
+            email.agentInput = SecurityManager.sanitizeInput(value);
+            
+            if (value.length >= CONFIG.MIN_AGENT_INPUT_LENGTH) {
+                textarea.classList.remove('invalid');
+            } else {
+                textarea.classList.add('invalid');
+            }
+
+            updateSendButtonState();
+        }
+
+        // Update send button state
+        function updateSendButtonState() {
+            const sendBtn = document.getElementById('sendBtn');
+            const emailsNeedingInput = pendingEmailsData.filter(e => e.needsAgentInput);
+            const completedInputs = emailsNeedingInput.filter(e => e.agentInput && e.agentInput.length >= CONFIG.MIN_AGENT_INPUT_LENGTH);
+            
+            const allInputsComplete = emailsNeedingInput.length === completedInputs.length;
+            const totalEmails = pendingEmailsData.length;
+            const needInputCount = emailsNeedingInput.length - completedInputs.length;
+
+            if (totalEmails === 0) {
+                sendBtn.disabled = true;
+                sendBtn.textContent = 'SEND ALL';
+            } else if (needInputCount > 0) {
+                sendBtn.disabled = true;
+                sendBtn.textContent = `SEND ALL (${needInputCount} need input)`;
+            } else {
+                sendBtn.disabled = false;
+                sendBtn.textContent = `SEND ALL (${totalEmails})`;
+            }
+        }
+
+        // Preview email
+        function previewEmail(emailId) {
+            const email = pendingEmailsData.find(e => e.id === emailId);
+            if (!email) return;
+
+            const modal = document.getElementById('emailPreviewModal');
+            const title = document.getElementById('modalPropertyTitle');
+            const content = document.getElementById('emailPreviewContent');
+
+            title.textContent = `Email Preview - ${email.subject}`;
+            
+            let emailContent = email.content;
+            if (email.needsAgentInput && email.agentInput) {
+                emailContent += `\n\n${email.agentInput}`;
+            }
+
+            content.textContent = emailContent;
+            modal.classList.add('active');
+        }
+
+        // Send all emails to real API
+        async function sendAllEmails() {
+            if (!checkAuth()) return;
+
+            const sendBtn = document.getElementById('sendBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+
+            try {
+                // Validate all emails
+                const validation = EmailValidator.validateBatch(pendingEmailsData);
+                if (validation.invalid > 0) {
+                    ErrorManager.showError(`${validation.invalid} emails have validation errors. Please complete all required fields.`);
+                    return;
+                }
+
+                // Update UI
+                sendBtn.disabled = true;
+                progressContainer.style.display = 'block';
+
+                // Create operation tracker
+                sendOperation = {
+                    id: Date.now(),
+                    cancelled: false
+                };
+
+                // Prepare emails with agent input
+                const emailsToSend = pendingEmailsData.map(email => ({
+                    ...email,
+                    finalContent: email.needsAgentInput && email.agentInput 
+                        ? `${email.content}\n\n${email.agentInput}`
+                        : email.content
+                }));
+
+                // Send emails via API
+                progressText.textContent = 'Sending emails...';
+                progressFill.style.width = '50%';
+
+                const response = await APIManager.sendEmails(emailsToSend);
+
+                if (response.success) {
+                    // Update stats in real-time
+                    const currentSent = parseInt(document.getElementById('emailsSent').textContent);
+                    document.getElementById('emailsSent').textContent = currentSent + emailsToSend.length;
+                    
+                    progressFill.style.width = '100%';
+                    progressText.textContent = 'Emails sent successfully!';
+
+                    // Show success
+                    setTimeout(() => {
+                        progressContainer.style.display = 'none';
+                        showSuccessModal(emailsToSend.length);
+
+                        // Reset
+                        pendingEmailsData = [];
+                        document.getElementById('pendingEmails').style.display = 'none';
+                        sendBtn.disabled = true;
+                        sendBtn.textContent = 'SEND ALL';
+                    }, 1000);
+                } else {
+                    throw new Error(response.message || 'Failed to send emails');
+                }
+
+            } catch (error) {
+                ErrorManager.handleNetworkError(error);
+                resetSendState();
+            }
+        }
+
+        // Show success modal
+        function showSuccessModal(emailCount) {
+            const modal = document.getElementById('successModal');
+            const message = document.getElementById('successMessage');
+            const emailCountEl = document.getElementById('successEmailCount');
+            const timeSavedEl = document.getElementById('successTimeSaved');
+
+            const timeSaved = emailCount * 5; // 5 minutes per email
+
+            message.textContent = `${emailCount} emails sent successfully to your prospects!`;
+            emailCountEl.textContent = emailCount;
+            timeSavedEl.textContent = timeSaved;
+
+            modal.classList.add('active');
+
+            // Auto-close after 3 seconds
+            setTimeout(() => {
+                modal.classList.remove('active');
+            }, 3000);
+        }
+
+        // Close success modal
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.remove('active');
+        }
+
+        // Reset scan state
+        function resetScanState() {
+            const scanBtn = document.getElementById('scanBtn');
+            const sendBtn = document.getElementById('sendBtn');
+            const progressContainer = document.getElementById('progressContainer');
+
+            scanBtn.disabled = false;
+            scanBtn.textContent = '🔍 SCAN FOR INQUIRIES';
+            sendBtn.disabled = true;
+            sendBtn.textContent = '📤 SEND ALL';
+            progressContainer.style.display = 'none';
+            
+            if (scanOperation) scanOperation.cancelled = true;
+        }
+
+        // Reset send state
+        function resetSendState() {
+            const sendBtn = document.getElementById('sendBtn');
+            const progressContainer = document.getElementById('progressContainer');
+
+            sendBtn.disabled = false;
+            progressContainer.style.display = 'none';
+            updateSendButtonState();
+            
+            if (sendOperation) sendOperation.cancelled = true;
+        }
+
+        // Load automation stats from API
+        async function loadAutomationStats() {
+            if (!checkAuth()) return;
+
+            try {
+                const data = await APIManager.makeRequest('/api/automation/stats');
+                
+                if (data.success && data.stats) {
+                    document.getElementById('emailsSent').textContent = data.stats.emails_sent || 0;
+                    document.getElementById('responseRate').textContent = `${data.stats.response_rate || 0}%`;
+                    document.getElementById('activePropertiesCount').textContent = data.stats.active_properties || 0;
+                    document.getElementById('toursScheduled').textContent = data.stats.tours_scheduled || 0;
+                }
+                
+            } catch (error) {
+                console.error('Error loading automation stats:', error);
+            }
+        }
+
+        // Load properties for automation
+        async function loadProperties() {
+            if (!checkAuth()) return;
+
+            try {
+                // Update user info
+                const agentName = localStorage.getItem('agent_name') || 'User';
+                document.getElementById('userInfo').textContent = agentName;
+
+                const data = await APIManager.makeRequest('/api/properties');
+                
+                // Handle different API response formats
+                let propertiesArray = [];
+                if (data.success && data.properties) {
+                    propertiesArray = data.properties;
+                } else if (Array.isArray(data)) {
+                    propertiesArray = data;
+                } else if (data.properties) {
+                    propertiesArray = data.properties;
+                }
+
+                properties = propertiesArray;
+                displayProperties(properties);
+                
+            } catch (error) {
+                console.error('Properties load error:', error);
+                displayEmptyState();
+            }
+        }
+
+        // Display properties
+        function displayProperties(properties) {
+            const propertiesGrid = document.getElementById('propertiesGrid');
+            
+            if (!properties || properties.length === 0) {
+                displayEmptyState();
+                return;
+            }
+
+            propertiesGrid.innerHTML = properties.map(property => `
+                <div class="property-card" onclick="showEmailPreview(${property.id})" style="position: relative;">
+                    <span class="status-badge ${property.is_active ? 'status-active' : 'status-inactive'}">
+                        ${property.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                    <div class="property-image"></div>
+                    <div class="property-content">
+                        <div class="property-address">${property.address}${property.unit ? ` ${property.unit}` : ''}</div>
+                        <div class="property-details">
+                            <span>${property.bedrooms || 'N/A'} bed</span>
+                            <span>${property.bathrooms || 'N/A'} bath</span>
+                            ${property.square_feet ? `<span>${property.square_feet} sq ft</span>` : ''}
+                        </div>
+                        <div class="property-rent">$${property.rent ? property.rent.toLocaleString() : 'N/A'}/month</div>
+                        <div class="automation-status">
+                            <span style="color: ${property.is_active ? 'var(--success-color)' : 'var(--text-muted)'}">
+                                ${property.is_active ? 'Automation Active' : 'Automation Paused'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Display empty state
+        function displayEmptyState() {
+            const propertiesGrid = document.getElementById('propertiesGrid');
+            propertiesGrid.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">🏢</div>
+                    <div class="empty-state-title">No properties found</div>
+                    <div class="empty-state-description">Add properties to start automating your lead responses</div>
+                </div>
+            `;
+        }
+
+        // Show email preview with exact Josie format
+        function showEmailPreview(propertyId) {
+            const property = properties.find(p => p.id === propertyId);
+            if (!property) return;
+
+            const modal = document.getElementById('emailPreviewModal');
+            const title = document.getElementById('modalPropertyTitle');
+            const content = document.getElementById('emailPreviewContent');
+
+            title.textContent = `Email Preview - ${property.address}${property.unit ? ` ${property.unit}` : ''}`;
+
+            // Calculate income requirements (annual - 40x and 80x monthly rent)
+            const annualIncome40x = property.rent * 40;
+            const annualIncome80x = property.rent * 80;
+
+            // Format availability date (convert YYYY-MM-DD to Month Day)
+            let formattedDate = '';
+            if (property.availability_date) {
+                try {
+                    // Parse date as local date to avoid timezone issues
+                    const dateParts = property.availability_date.split('-');
+                    const year = parseInt(dateParts[0]);
+                    const month = parseInt(dateParts[1]) - 1; // Month is 0-indexed
+                    const day = parseInt(dateParts[2]);
+                    const date = new Date(year, month, day);
+                    
+                    formattedDate = date.toLocaleDateString('en-US', { 
+                        month: 'long', 
+                        day: 'numeric' 
+                    });
+                } catch (e) {
+                    formattedDate = property.availability_date; // fallback to original
+                }
+            }
+
+            // Generate email content with exact format you specified
+            const emailContent = `Subject: Re: Your inquiry about ${property.address}${property.unit ? ` ${property.unit}` : ''}
+
+**Thank you for your inquiry!**
+
+Hi [Prospect Name],
+
+Hope all is well and thank you for your interest in ${property.address}${property.unit ? ` ${property.unit}` : ''}!
+
+If you would like to schedule a tour, please click the following link:
+${property.acuity_id ? `**Schedule Your Private Showing**
+https://app.acuityscheduling.com/schedule.php?appointmentType=${property.acuity_id}` : '**Schedule Your Private Showing** (Contact us to schedule)'}
+
+Thank you, and looking forward to meeting you!
+
+**Best,**
+
+**Nicholas Pagano**
+Licensed Real Estate Salesperson
+Besen Partners
+npagano@besenpartners.com
+(718) 772-3227
+
+**Application requirements for reference:**
+* Applicants must have an annual income of 40x the monthly rent ($${annualIncome40x?.toLocaleString() || 'N/A'})
+* If more than one person is applying, their incomes may be combined
+* Minimum credit score required is 650
+* Guarantors are accepted. A guarantor must have an annual income of 80x the monthly rent ($${annualIncome80x?.toLocaleString() || 'N/A'}) and excellent credit
+* More than one guarantor may be used
+* $20 application fee per applicant${property.availability_date ? `
+* Owner is seeking a ${formattedDate} lease-start` : ''}`;
+
+            content.textContent = emailContent;
+            modal.classList.add('active');
+        }
+
+        // Close email preview
+        function closeEmailPreview() {
+            document.getElementById('emailPreviewModal').classList.remove('active');
+        }
+
+        // Configure email templates
+        function configureEmailTemplates() {
+            alert('Email template configuration coming soon!');
+        }
+
+        // Configure calendar settings
+        function configureCalendarSettings() {
+            alert('Calendar integration configuration coming soon!');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('emailPreviewModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEmailPreview();
+            }
+        });
+
+        document.getElementById('successModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSuccessModal();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeEmailPreview();
+                closeSuccessModal();
+            }
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                loadAutomationStats();
+                loadProperties();
+            } catch (error) {
+                console.error('Initialization error:', error);
+                ErrorManager.showError('Failed to initialize application. Please refresh the page.');
+            }
+        });
+    </script>
+</body>
+</html>

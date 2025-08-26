@@ -1,75 +1,179 @@
+ 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LeadFlow Pro API</title>
+    <title>LeadFlow Pro - Your Real Estate Lead Intelligence Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; }
-        .status { display: inline-block; padding: 5px 10px; border-radius: 5px; color: white; font-weight: bold; }
-        .online { background: #28a745; }
-        .endpoint { background: #f8f9fa; padding: 10px; margin: 10px 0; border-left: 4px solid #007bff; }
-        code { background: #e9ecef; padding: 2px 5px; border-radius: 3px; }
+        :root {
+            --primary-color: #000000;
+            --secondary-color: #666666;
+            --border-color: #e5e5e5;
+            --bg-light: #fafafa;
+            --bg-white: #ffffff;
+            --text-primary: #000000;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --success-color: #10b981;
+            --radius: 8px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-white);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 400;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-cta {
+            background: var(--text-primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-cta:hover {
+            background: var(--secondary-color);
+            transform: translateY(-1px);
+        }
+
+        .hero {
+            padding: 80px 0 120px;
+            text-align: center;
+            background: linear-gradient(180deg, var(--bg-white) 0%, var(--bg-light) 100%);
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 600;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+        }
+
+        .hero .subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-button {
+            background: var(--text-primary);
+            color: white;
+            padding: 16px 32px;
+            border-radius: var(--radius);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            display: inline-block;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .cta-button:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 40px;
+            }
+            .nav-links {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🚀 LeadFlow Pro API</h1>
-        <div class="status online">ONLINE</div>
-        
-        <h2>API Status</h2>
-        <p>✅ Server Running on Port 3000</p>
-        <p>✅ MongoDB Connected</p>
-        <p>✅ All Endpoints Functional</p>
-        
-        <h2>Available Endpoints</h2>
-        
-        <div class="endpoint">
-            <strong>Health Check</strong><br>
-            <code>GET /api/health</code>
+    <nav>
+        <div class="container">
+            <div class="nav-container">
+                <a href="/" class="logo">LeadFlow Pro</a>
+                <ul class="nav-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#automation">Automation</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="/login">Sign in</a></li>
+                </ul>
+                <a href="/signup" class="nav-cta">Get started</a>
+            </div>
         </div>
-        
-        <div class="endpoint">
-            <strong>User Registration</strong><br>
-            <code>POST /api/auth/register</code>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Your real estate lead intelligence assistant.</h1>
+            <p class="subtitle">
+                LeadFlow Pro learns your communication style and automates the entire lead cycle. 
+                Email parsing, prospect intelligence, and follow-up — all in your authentic voice, 
+                without your constant attention.
+            </p>
+            <a href="/signup" class="cta-button">Start free trial</a>
         </div>
-        
-        <div class="endpoint">
-            <strong>User Login</strong><br>
-            <code>POST /api/auth/login</code>
-        </div>
-        
-        <div class="endpoint">
-            <strong>Email Configuration</strong><br>
-            <code>GET/POST /api/email/config</code>
-        </div>
-        
-        <div class="endpoint">
-            <strong>Lead Management</strong><br>
-            <code>GET/POST /api/leads</code>
-        </div>
-        
-        <div class="endpoint">
-            <strong>Email Campaigns</strong><br>
-            <code>GET/POST /api/campaigns</code>
-        </div>
-        
-        <div class="endpoint">
-            <strong>Analytics & Stats</strong><br>
-            <code>GET /api/stats</code>
-        </div>
-        
-        <h2>Current Access</h2>
-        <p><strong>Public URL:</strong> <a href="https://wide-otters-appear.loca.lt" target="_blank">https://wide-otters-appear.loca.lt</a></p>
-        <p><strong>API Health:</strong> <a href="https://wide-otters-appear.loca.lt/api/health" target="_blank">Test API</a></p>
-        
-        <h2>Next Steps</h2>
-        <ol>
-            <li>Update DNS settings for reflows.app to point to the localtunnel URL</li>
-            <li>For production, deploy to a proper hosting service</li>
-            <li>Configure SSL certificate for custom domain</li>
-        </ol>
-    </div>
+    </section>
 </body>
 </html>

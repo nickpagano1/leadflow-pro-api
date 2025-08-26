@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar & Scheduling - LeadFlow Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        .booking-card:hover {
+            transform: translateY(-2px);
+            transition: all 0.2s ease;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: #e5e7eb;
+        }
+        .calendar-day {
+            background-color: white;
+            min-height: 100px;
+            padding: 8px;
+        }
+        .appointment-block {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 4px 6px;
+            border-radius: 4px;
+            margin: 2px 0;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        .appointment-block:hover {
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <h1 class="text-xl font-bold text-gray-900">LeadFlow Pro</h1>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="/dashboard" class="text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium">Dashboard</a>
+                        <a href="/properties" class="text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium">Properties</a>
+                        <a href="/inquiries" class="text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium">Inquiries</a>
+                        <a href="/automation" class="text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium">Automation</a>
+                        <a href="/calendar" class="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-gray-900 text-sm font-medium">Calendar</a>
+                        <a href="/analytics" class="text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium">Analytics</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Your Schedule</h1>
+            <p class="mt-2 text-gray-600">View and manage your property viewing appointments</p>
+        </div>
+
+        <!-- Today's Schedule & Quick Stats -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Today's Appointments -->
+            <div class="lg:col-span-2 bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">Today's Appointments</h3>
+                    <div class="text-sm text-gray-500" id="todayDate"></div>
+                </div>
+                <div id="todayAppointments" class="space-y-4">
+                    <!-- Today's appointments will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">This Week</h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">Total Appointments</span>
+                        <span class="text-lg font-bold text-blue-600" id="weekTotal">6</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">Today</span>
+                        <span class="text-lg font-bold text-green-600" id="todayTotal">2</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">Tomorrow</span>
+                        <span class="text-lg font-bold text-orange-600" id="tomorrowTotal">1</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">This Month</span>
+                        <span class="text-lg font-bold text-purple-600" id="monthTotal">18</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar View -->
+        <div class="bg-white rounded-lg border border-gray-200 shadow-sm mb-8">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-medium text-gray-900">Calendar View</h3>
+                    <div class="flex items-center space-x-4">
+                        <button onclick="previousMonth()" class="p-1 text-gray-400 hover:text-gray-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </button>
+                        <h4 class="text-lg font-medium text-gray-900" id="currentMonth"></h4>
+                        <button onclick="nextMonth()" class="p-1 text-gray-400 hover:text-gray-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                        <div class="border-l border-gray-200 pl-4">
+                            <button onclick="goToToday()" class="text-sm text-gray-600 hover:text-gray-900">
+                                Today
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6">
+                <!-- Calendar Header -->
+                <div class="calendar-grid mb-1">
+                    <div class="text-center text-sm font-medium text-gray-500 p-2">Sun</div>
+                    <div class="text-center text-sm font-medium text-gray-500 p-2">Mon</div>
+                    <div class="text-center text-sm font-medium text-gray-500 p-2">Tue</div>
+                    <div class="text-center text-sm font-medium text-gray-500 p-2">Wed</div>
+                    <div class="text-center text-sm font-medium text-gray-500 p-2">Thu</div>
+                    <div class="text-center text-sm font-medium text-gray-500 p-2">Fri</div>
+                    <div class="text-center text-sm font-medium text-gray-500 p-2">Sat</div>
+                </div>
+                <!-- Calendar Body -->
+                <div class="calendar-grid" id="calendarBody">
+                    <!-- Calendar days will be generated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Property Booking Links & Management -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Booking Links -->
+            <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Booking Links</h3>
+                    <p class="text-sm text-gray-500 mt-1">Share these links with prospects to book viewings</p>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">336 West 17th Street #1A</p>
+                            <p class="text-xs text-gray-500">Private Showing</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="copyLink('https://app.acuityscheduling.com/schedule.php?owner=36392243&appointmentType=81089079')" class="text-blue-600 hover:text-blue-800 text-sm">
+                                Copy Link
+                            </button>
+                            <button onclick="openBookingPage('https://app.acuityscheduling.com/schedule.php?owner=36392243&appointmentType=81089079')" class="text-blue-600 hover:text-blue-800 text-sm">
+                                Open
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">49 Prince Street #20</p>
+                            <p class="text-xs text-gray-500">Private Showing</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="copyLink('https://app.acuityscheduling.com/schedule.php?owner=36392243&appointmentType=81089384')" class="text-green-600 hover:text-green-800 text-sm">
+                                Copy Link
+                            </button>
+                            <button onclick="openBookingPage('https://app.acuityscheduling.com/schedule.php?owner=36392243&appointmentType=81089384')" class="text-green-600 hover:text-green-800 text-sm">
+                                Open
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-200">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">311 West 21st Street #GW</p>
+                            <p class="text-xs text-gray-500">Private Showing</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="copyLink('https://app.acuityscheduling.com/schedule.php?owner=36392243&appointmentType=81261507')" class="text-purple-600 hover:text-purple-800 text-sm">
+                                Copy Link
+                            </button>
+                            <button onclick="openBookingPage('https://app.acuityscheduling.com/schedule.php?owner=36392243&appointmentType=81261507')" class="text-purple-600 hover:text-purple-800 text-sm">
+                                Open
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-200">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">218 West 22nd Street #1FE</p>
+                            <p class="text-xs text-gray-500">Private Showing</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="copyLink('https://app.acuityscheduling.com/schedule.php?owner=36392243&appointmentType=81368081')" class="text-orange-600 hover:text-orange-800 text-sm">
+                                Copy Link
+                            </button>
+                            <button onclick="openBookingPage('https://app.acuityscheduling.com/schedule.php?owner=36392243&appointmentType=81368081')" class="text-orange-600 hover:text-orange-800 text-sm">
+                                Open
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Appointments -->
+            <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Upcoming Appointments</h3>
+                </div>
+                <div id="upcomingAppointments" class="divide-y divide-gray-200">
+                    <!-- Upcoming appointments will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointment Detail Modal -->
+    <div id="appointmentModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">Appointment Details</h3>
+                    <button onclick="closeAppointmentModal()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="space-y-4" id="appointmentDetails">
+                    <!-- Appointment details will be loaded here -->
+                </div>
+                
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button onclick="closeAppointmentModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+                        Close
+                    </button>
+                    <button onclick="rescheduleAppointment()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        Reschedule
+                    </button>
+                    <button onclick="cancelAppointment()" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDate = new Date();
+        let currentAppointment = null;
+
+        // Sample appointment data - in real implementation, this would come from Acuity API
+        const sampleAppointments = [
+            {
+                id: 1,
+                client: 'Sarah Johnson',
+                email: 'sarah.j@email.com',
+                phone: '(555) 123-4567',
+                property: '49 Prince Street #20',
+                date: '2025-08-08',
+                time: '2:00 PM',
+                duration: '45 mins',
+                type: 'Private Showing',
+                status: 'confirmed'
+            },
+            {
+                id: 2,
+                client: 'Michael Chen',
+                email: 'mchen@email.com',
+                phone: '(555) 987-6543',
+                property: '336 West 17th Street #1A',
+                date: '2025-08-08',
+                time: '4:30 PM',
+                duration: '45 mins',
+                type: 'Private Showing',
+                status: 'confirmed'
+            },
+            {
+                id: 3,
+                client: 'Emily Rodriguez',
+                email: 'emily.r@email.com',
+                phone: '(555) 456-7890',
+                property: '311 West 21st Street #GW',
+                date: '2025-08-09',
+                time: '11:00 AM',
+                duration: '45 mins',
+                type: 'Private Showing',
+                status: 'confirmed'
+            },
+            {
+                id: 4,
+                client: 'David Park',
+                email: 'dpark@email.com',
+                phone: '(555) 321-9876',
+                property: '218 West 22nd Street #1FE',
+                date: '2025-08-10',
+                time: '3:00 PM',
+                duration: '45 mins',
+                type: 'Private Showing',
+                status: 'confirmed'
+            },
+            {
+                id: 5,
+                client: 'Lisa Thompson',
+                email: 'lisa.t@email.com',
+                phone: '(555) 654-3210',
+                property: '49 Prince Street #20',
+                date: '2025-08-12',
+                time: '1:30 PM',
+                duration: '45 mins',
+                type: 'Private Showing',
+                status: 'confirmed'
+            },
+            {
+                id: 6,
+                client: 'James Wilson',
+                email: 'j.wilson@email.com',
+                phone: '(555) 789-0123',
+                property: '336 West 17th Street #1A',
+                date: '2025-08-14',
+                time: '10:00 AM',
+                duration: '45 mins',
+                type: 'Private Showing',
+                status: 'confirmed'
+            }
+        ];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Calendar page loaded');
+            initializePage();
+        });
+
+        function initializePage() {
+            // Set today's date
+            const today = new Date();
+            document.getElementById('todayDate').textContent = today.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+
+            displayTodayAppointments();
+            displayUpcomingAppointments();
+            generateCalendar();
+        }
+
+        function displayTodayAppointments() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayAppts = sampleAppointments.filter(apt => apt.date === today);
+            const container = document.getElementById('todayAppointments');
+
+            if (todayAppts.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <svg class="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <p class="text-gray-500">No appointments today</p>
+                        <p class="text-sm text-gray-400 mt-1">Enjoy your free day!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = todayAppts.map(apt => `
+                <div class="flex items-center space-x-4 p-4 bg-blue-50 rounded-lg border border-blue-200 cursor-pointer hover:bg-blue-100" onclick="showAppointmentDetails(${apt.id})">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="text-lg font-medium text-gray-900">${apt.time} - ${apt.client}</h4>
+                        <p class="text-sm text-gray-600">${apt.property}</p>
+                        <p class="text-xs text-gray-500">${apt.type} • ${apt.duration}</p>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Confirmed
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function displayUpcomingAppointments() {
+            const today = new Date();
+            const upcomingAppts = sampleAppointments
+                .filter(apt => new Date(apt.date) >= today)
+                .sort((a, b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time))
+                .slice(0, 5);
+
+            const container = document.getElementById('upcomingAppointments');
+
+            if (upcomingAppts.length === 0) {
+                container.innerHTML = '<div class="px-6 py-4 text-center text-gray-500"><p class="text-sm">No upcoming appointments</p></div>';
+                return;
+            }
+
+            container.innerHTML = upcomingAppts.map(apt => `
+                <div class="px-6 py-4 hover:bg-gray-50 cursor-pointer" onclick="showAppointmentDetails(${apt.id})">
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900">${apt.client}</p>
+                            <p class="text-sm text-gray-500">${apt.property}</p>
+                            <p class="text-xs text-gray-400">${formatDate(apt.date)} at ${apt.time}</p>
+                        </div>
+                        <div>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                ${apt.status}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function generateCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            // Update month display
+            document.getElementById('currentMonth').textContent = currentDate.toLocaleDateString('en-US', { 
+                month: 'long', 
+                year: 'numeric' 
+            });
+
+            // Get first day of month and number of days
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+            const calendarBody = document.getElementById('calendarBody');
+            calendarBody.innerHTML = '';
+
+            // Generate 6 weeks of calendar
+            for (let week = 0; week < 6; week++) {
+                for (let day = 0; day < 7; day++) {
+                    const currentDay = new Date(startDate);
+                    currentDay.setDate(startDate.getDate() + (week * 7) + day);
+                    
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day';
+                    
+                    const isCurrentMonth = currentDay.getMonth() === month;
+                    const isToday = currentDay.toDateString() === new Date().toDateString();
+                    
+                    // Day number
+                    const dayNumber = document.createElement('div');
+                    dayNumber.className = `text-sm font-medium ${isCurrentMonth ? 'text-gray-900' : 'text-gray-400'} ${isToday ? 'bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center' : ''}`;
+                    dayNumber.textContent = currentDay.getDate();
+                    dayElement.appendChild(dayNumber);
+
+                    // Appointments for this day
+                    const dayString = currentDay.toISOString().split('T')[0];
+                    const dayAppointments = sampleAppointments.filter(apt => apt.date === dayString);
+                    
+                    dayAppointments.forEach(apt => {
+                        const apptElement = document.createElement('div');
+                        apptElement.className = 'appointment-block';
+                        apptElement.textContent = `${apt.time} ${apt.client}`;
+                        apptElement.onclick = () => showAppointmentDetails(apt.id);
+                        dayElement.appendChild(apptElement);
+                    });
+
+                    calendarBody.appendChild(dayElement);
+                }
+            }
+        }
+
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            generateCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            generateCalendar();
+        }
+
+        function goToToday() {
+            currentDate = new Date();
+            generateCalendar();
+        }
+
+        function showAppointmentDetails(appointmentId) {
+            const appointment = sampleAppointments.find(apt => apt.id === appointmentId);
+            if (!appointment) return;
+
+            currentAppointment = appointment;
+
+            document.getElementById('appointmentDetails').innerHTML = `
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Client</label>
+                    <p class="mt-1 text-sm text-gray-900">${appointment.client}</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Email</label>
+                    <p class="mt-1 text-sm text-gray-900">${appointment.email}</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Phone</label>
+                    <p class="mt-1 text-sm text-gray-900">${appointment.phone}</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Property</label>
+                    <p class="mt-1 text-sm text-gray-900">${appointment.property}</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Date & Time</label>
+                    <p class="mt-1 text-sm text-gray-900">${formatDate(appointment.date)} at ${appointment.time}</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Duration</label>
+                    <p class="mt-1 text-sm text-gray-900">${appointment.duration}</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Status</label>
+                    <span class="mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        ${appointment.status}
+                    </span>
+                </div>
+            `;
+
+            document.getElementById('appointmentModal').classList.remove('hidden');
+        }
+
+        function closeAppointmentModal() {
+            document.getElementById('appointmentModal').classList.add('hidden');
+            currentAppointment = null;
+        }
+
+        function rescheduleAppointment() {
+            if (currentAppointment) {
+                alert(`Reschedule appointment with ${currentAppointment.client}\n(In real implementation, this would open Acuity's reschedule interface)`);
+            }
+        }
+
+        function cancelAppointment() {
+            if (currentAppointment) {
+                const confirmed = confirm(`Are you sure you want to cancel the appointment with ${currentAppointment.client}?`);
+                if (confirmed) {
+                    alert(`Appointment canceled\n(In real implementation, this would cancel via Acuity API)`);
+                    closeAppointmentModal();
+                }
+            }
+        }
+
+        // Booking link functions
+        function openBookingPage(url) {
+            window.open(url, '_blank');
+        }
+
+        function copyLink(url) {
+            navigator.clipboard.writeText(url).then(() => {
+                showMessage('Booking link copied to clipboard!', 'success');
+            }).catch(() => {
+                showMessage('Failed to copy link', 'error');
+            });
+        }
+
+        // Utility functions
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        function showMessage(message, type = 'info') {
+            const messageEl = document.createElement('div');
+            messageEl.className = `fixed top-4 right-4 max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto z-50`;
+            
+            const bgColor = type === 'success' ? 'bg-green-50 border-green-200' : 
+                           type === 'error' ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200';
+            
+            const textColor = type === 'success' ? 'text-green-800' : 
+                             type === 'error' ? 'text-red-800' : 'text-blue-800';
+            
+            messageEl.innerHTML = `
+                <div class="border ${bgColor} rounded-lg p-4">
+                    <div class="flex">
+                        <div class="flex-1">
+                            <p class="text-sm font-medium ${textColor}">${message}</p>
+                        </div>
+                        <div class="ml-4 flex-shrink-0">
+                            <button onclick="this.parentElement.parentElement.parentElement.parentElement.remove()" class="${textColor} hover:${textColor}">
+                                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(messageEl);
+            
+            setTimeout(() => {
+                if (messageEl.parentElement) {
+                    messageEl.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
+<a href="/email-setup" class="text-gray-500 hover:text-gray-700">Email Setup</a>
