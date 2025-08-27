@@ -277,12 +277,8 @@ const authenticateToken = (req, res, next) => {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  // Check if this is a browser request by looking at User-Agent
-  const userAgent = req.headers['user-agent'] || '';
-  const isBrowser = userAgent.includes('Mozilla') || userAgent.includes('Chrome') || userAgent.includes('Safari') || userAgent.includes('Edge');
-  
-  // Serve signup form for browser requests, JSON for API calls
-  if (isBrowser) {
+  // Always serve signup form now
+  if (true) {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'no-cache');
     
@@ -533,7 +529,12 @@ Check browser console (F12) for technical details.\`;
     return res.status(200).send(signupHtml);
   }
   
-  // Default health check response
+  // This code will never execute now since we always return HTML above
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+// JSON health check endpoint for monitoring
+app.get('/api/healthcheck', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
