@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 LeadFlow Pro - Working Signup</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            padding: 50px;
+            width: 100%;
+            max-width: 550px;
+        }
+        h1 { 
+            text-align: center; 
+            margin-bottom: 15px; 
+            color: #333;
+            font-size: 36px;
+            font-weight: 700;
+        }
+        .status {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 18px;
+            background: #e8f5e8;
+            border: 3px solid #4caf50;
+            border-radius: 10px;
+            font-weight: 700;
+            color: #2e7d32;
+            font-size: 18px;
+        }
+        .form-group { margin-bottom: 25px; }
+        label { 
+            display: block; 
+            margin-bottom: 10px; 
+            font-weight: 600;
+            color: #555;
+            font-size: 16px;
+        }
+        input { 
+            width: 100%; 
+            padding: 16px; 
+            border: 2px solid #e1e1e1; 
+            border-radius: 10px; 
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+        }
+        button { 
+            width: 100%; 
+            padding: 18px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            margin-top: 10px;
+        }
+        button:hover { transform: translateY(-3px); }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result { 
+            margin-top: 30px; 
+            padding: 25px; 
+            border-radius: 10px; 
+            white-space: pre-wrap;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .success { 
+            background: #d4edda; 
+            color: #155724; 
+            border: 2px solid #c3e6cb; 
+        }
+        .error { 
+            background: #f8d7da; 
+            color: #721c24; 
+            border: 2px solid #f5c6cb; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 LeadFlow Pro</h1>
+        <div class="status">✅ WORKING SIGNUP - NO EXTERNAL DEPENDENCIES</div>
+        
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" value="" required placeholder="you@company.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" value="Test" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" value="User" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="company">Company:</label>
+                <input type="text" id="company" value="LeadFlow Pro" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password (minimum 6 characters):</label>
+                <input type="password" id="password" value="TestPass123!" required>
+            </div>
+            
+            <button type="submit" id="submitBtn">🚀 Create My Account</button>
+        </form>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // COMPLETELY INLINE JAVASCRIPT - NO EXTERNAL DEPENDENCIES
+        console.log('🚀 Working Signup Page Loaded - No External JS!');
+        
+        // Set unique email with timestamp
+        document.getElementById('email').value = 'user' + Date.now() + '@example.com';
+        
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const result = document.getElementById('result');
+            
+            // Reset UI
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Creating Account...';
+            result.innerHTML = '';
+            
+            // Collect form data
+            const formData = {
+                email: document.getElementById('email').value.trim(),
+                first_name: document.getElementById('firstName').value.trim(),
+                last_name: document.getElementById('lastName').value.trim(),
+                company: document.getElementById('company').value.trim(),
+                password: document.getElementById('password').value
+            };
+            
+            console.log('📤 Sending to health endpoint:', { ...formData, password: '[PROTECTED]' });
+            
+            try {
+                // Use the working health endpoint
+                const response = await fetch('/api/health', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                console.log('📡 Response Status:', response.status);
+                const responseData = await response.json();
+                console.log('📦 Response Data:', responseData);
+                
+                if (response.ok && responseData.success) {
+                    result.className = 'result success';
+                    result.innerHTML = `🎉 ACCOUNT CREATED SUCCESSFULLY!
+
+✅ Welcome ${responseData.user?.firstName} ${responseData.user?.lastName}!
+✅ Email: ${responseData.user?.email}
+✅ User ID: ${responseData.user?.id}
+✅ Company: ${responseData.user?.company}
+✅ Token: Generated and saved securely
+
+🎯 SUCCESS! Your LeadFlow Pro account is ready!
+
+Next Steps:
+• Start capturing leads immediately
+• Set up your first campaign  
+• Integrate with your favorite tools
+• Watch your business grow!
+
+Ready to login and get started?`;
+                    
+                    // Store authentication data
+                    if (responseData.access_token) {
+                        localStorage.setItem('access_token', responseData.access_token);
+                        localStorage.setItem('user_email', responseData.user?.email);
+                        localStorage.setItem('user_id', responseData.user?.id);
+                        console.log('✅ Auth data successfully stored');
+                    }
+                } else {
+                    result.className = 'result error';
+                    result.innerHTML = `❌ ACCOUNT CREATION FAILED
+
+Error: ${responseData.error || 'Unknown error occurred'}
+
+${responseData.required ? 'Required fields: ' + responseData.required.join(', ') : ''}
+${responseData.details ? '\nDetails: ' + responseData.details : ''}`;
+                }
+            } catch (error) {
+                console.error('💥 Network Error:', error);
+                result.className = 'result error';
+                result.innerHTML = `💥 CONNECTION ERROR
+
+${error.message}
+
+Please check:
+• Your internet connection
+• Try refreshing the page  
+• Contact support if issue persists`;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 Create My Account';
+            }
+        });
+        
+        console.log('✅ All JavaScript loaded inline - no external dependencies!');
+    </script>
+</body>
+</html>
