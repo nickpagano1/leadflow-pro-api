@@ -86,10 +86,20 @@ module.exports = async (req, res) => {
       retryWrites: true
     });
     
+    console.log('Raw request body:', req.body);
+    console.log('Request body type:', typeof req.body);
+    console.log('Request body keys:', req.body ? Object.keys(req.body) : 'NO BODY');
+    
     const { email, password, first_name, last_name, company, phone, plan } = req.body;
 
     console.log('Signup attempt for:', email);
-    console.log('Received data:', { email, first_name, last_name, company, has_password: !!password });
+    console.log('Extracted values:', { 
+      email: email || 'MISSING', 
+      first_name: first_name || 'MISSING', 
+      last_name: last_name || 'MISSING', 
+      company: company || 'MISSING',
+      password: password ? 'PROVIDED' : 'MISSING'
+    });
 
     // Validation
     if (!email || !password || !first_name || !last_name) {
