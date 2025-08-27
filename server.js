@@ -455,8 +455,8 @@ app.get('/api/health', (req, res) => {
             console.log('📤 Sending data:', { ...formData, password: '[HIDDEN]' });
             
             try {
-                // Use the working Express login endpoint structure for signup
-                const response = await fetch('/api/auth/signup', {
+                // Use the simple working register endpoint
+                const response = await fetch('/api/register', {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
@@ -532,6 +532,78 @@ Check browser console (F12) for technical details.\`;
   // Default health check response
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
+
+// SIMPLE WORKING SIGNUP ENDPOINT
+app.post('/api/register', asyncHandler(async (req, res) => {
+  try {
+    console.log('Registration request received');
+    
+    // Connect to database
+    await connectDB();
+    console.log('Database connected');
+    
+    const { email, password, first_name, last_name, company } = req.body;
+    
+    // Basic validation
+    if (!email || !password || !first_name || !last_name) {
+      return res.status(400).json({ 
+        error: 'Missing required fields',
+        required: ['email', 'password', 'first_name', 'last_name'],
+        received: { email: !!email, password: !!password, first_name: !!first_name, last_name: !!last_name }
+      });
+    }
+    
+    // Check if user exists
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(400).json({ error: 'User already exists with this email' });
+    }
+    
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 12);
+    
+    // Create user
+    const newUser = new User({
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      firstName: first_name,
+      lastName: last_name,
+      company: company || 'Not specified',
+      subscription: 'free',
+      isActive: true
+    });
+    
+    const savedUser = await newUser.save();
+    console.log('User saved:', savedUser._id);
+    
+    // Generate token
+    const token = jwt.sign(
+      { userId: savedUser._id, email: savedUser.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+    
+    res.status(201).json({
+      success: true,
+      message: 'Account created successfully!',
+      access_token: token,
+      user: {
+        id: savedUser._id,
+        email: savedUser.email,
+        firstName: savedUser.firstName,
+        lastName: savedUser.lastName,
+        company: savedUser.company
+      }
+    });
+    
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ 
+      error: 'Failed to create account',
+      details: error.message
+    });
+  }
+}));
 
 // WORKING SIGNUP FORM (using create-account endpoint)
 app.get('/api/signup', (req, res) => {
