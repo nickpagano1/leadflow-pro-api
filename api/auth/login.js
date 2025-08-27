@@ -1,0 +1,166 @@
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const validator = require('validator');
+require('dotenv').config();
+
+// MongoDB connection (reuse from signup.js)
+let cachedConnection = null;
+
+const connectDB = async () => {
+  if (cachedConnection && mongoose.connection.readyState === 1) {
+    return cachedConnection;
+  }
+  
+  try {
+    const connection = await mongoose.connect(process.env.MONGODB_URI, {
+      bufferCommands: false,
+      maxPoolSize: 1,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      family: 4,
+      maxIdleTimeMS: 30000,
+      retryWrites: true
+    });
+    
+    cachedConnection = connection;
+    console.log('MongoDB connected successfully');
+    return connection;
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    throw new Error(`Database connection failed: ${error.message}`);
+  }
+};
+
+// User Schema (same as signup.js)
+const userSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    validate: [validator.isEmail, 'Invalid email address']
+  },
+  password: {
+    type: String,
+    required: true,
+    minlength: 6
+  },
+  firstName: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  lastName: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  company: {
+    type: String,
+    trim: true
+  },
+  phone: {
+    type: String,
+    trim: true
+  },
+  subscription: {
+    type: String,
+    enum: ['free', 'basic', 'pro', 'enterprise'],
+    default: 'free'
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+  lastLogin: {
+    type: Date
+  }
+}, {
+  timestamps: true
+});
+
+const User = mongoose.models.User || mongoose.model('User', userSchema);
+
+module.exports = async (req, res) => {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    await connectDB();
+
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password required' });
+    }
+
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
+
+    // Find user
+    const user = await User.findOne({ email: email.toLowerCase() })
+      .select('+password');
+
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid credentials' });
+    }
+
+    // Verify password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ error: 'Invalid credentials' });
+    }
+
+    // Update last login
+    user.lastLogin = new Date();
+    await user.save();
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    console.log('Login successful for:', email);
+
+    res.json({
+      message: 'Login successful',
+      access_token: token,
+      token,
+      agent: {
+        id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        company: user.company,
+        subscription: user.subscription,
+        lastLogin: user.lastLogin
+      },
+      user: {
+        id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        company: user.company,
+        subscription: user.subscription,
+        lastLogin: user.lastLogin
+      }
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Internal server error during login' });
+  }
+};
