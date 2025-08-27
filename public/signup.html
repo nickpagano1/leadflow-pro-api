@@ -91,8 +91,8 @@
         <div class="logo">LeadFlow Pro</div>
         
         <div class="trial">
-            <strong>🚀 WORKING SIGNUP FORM</strong><br>
-            Static file - bypasses all deployment issues
+            <strong>🚀 DIAGNOSTIC SIGNUP FORM</strong><br>
+            Testing endpoint availability
         </div>
 
         <form id="signupForm" method="POST" action="/api/health">
@@ -132,6 +132,45 @@
     <script>
         // Inline the signup JavaScript to bypass caching issues
         console.log('🚀 Static signup.html loaded successfully!');
+        
+        // Test which endpoints actually work
+        async function testEndpoints() {
+            console.log('🔍 Testing available endpoints...');
+            
+            try {
+                const healthTest = await fetch('/api/health');
+                const healthData = await healthTest.json();
+                console.log('✅ /api/health GET works:', healthData);
+            } catch (e) {
+                console.log('❌ /api/health GET failed:', e.message);
+            }
+            
+            try {
+                const loginTest = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({email: 'test@test.com', password: 'test'})
+                });
+                const loginData = await loginTest.json();
+                console.log('✅ /api/auth/login POST works:', loginData);
+            } catch (e) {
+                console.log('❌ /api/auth/login POST failed:', e.message);
+            }
+            
+            try {
+                const healthPost = await fetch('/api/health', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({test: 'data'})
+                });
+                const healthPostData = await healthPost.json();
+                console.log('✅ /api/health POST works:', healthPostData);
+            } catch (e) {
+                console.log('❌ /api/health POST failed:', e.message);
+            }
+        }
+        
+        testEndpoints();
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('signupForm');
             const submitBtn = document.querySelector('button[type="submit"]');
@@ -171,7 +210,8 @@
                 console.log('Sending data:', data);
 
                 try {
-                    const response = await fetch('/api/health', {
+                    console.log('🚀 Attempting signup via login endpoint...');
+                    const response = await fetch('/api/auth/login', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(data)
