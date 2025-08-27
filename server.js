@@ -280,6 +280,27 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// Database health check endpoint
+app.get('/api/health/db', asyncHandler(async (req, res) => {
+  try {
+    await connectDB();
+    const dbState = mongoose.connection.readyState;
+    const states = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
+    
+    res.json({ 
+      status: 'OK', 
+      database: states[dbState] || 'unknown',
+      timestamp: new Date().toISOString() 
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      status: 'ERROR', 
+      error: error.message,
+      timestamp: new Date().toISOString() 
+    });
+  }
+}));
+
 // Authentication endpoints
 app.post('/api/auth/register', asyncHandler(async (req, res) => {
   await connectDB();
