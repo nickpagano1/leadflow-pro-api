@@ -800,7 +800,7 @@ app.post('/api/scan/leads', authenticateToken, async (req, res) => {
 
 // Homepage route - serve your website
 app.get('/', (req, res) => {
-  res.sendFile('index.html', { root: 'public' });
+  res.sendFile('index.html', { root: __dirname + '/public' });
 });
 
 // Global error handler
