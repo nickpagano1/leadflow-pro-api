@@ -310,6 +310,75 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
+// Signup endpoint (alias for register to match frontend)
+app.post('/api/auth/signup', async (req, res) => {
+  try {
+    const { email, password, first_name, last_name, company, phone, plan } = req.body;
+
+    // Validation
+    if (!email || !password || !first_name || !last_name) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
+    // Check if user exists
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(400).json({ error: 'User already exists' });
+    }
+
+    // Hash password
+    const saltRounds = 12;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Create user
+    const user = new User({
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      firstName: first_name,
+      lastName: last_name,
+      company,
+      phone: phone || '5551234567',
+      subscription: plan || 'premium'
+    });
+
+    await user.save();
+
+    // Generate JWT
+    const token = jwt.sign(
+      { userId: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'User registered successfully',
+      access_token: token,
+      agent_id: user._id,
+      agent_name: `${user.firstName} ${user.lastName}`,
+      user: {
+        id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        company: user.company,
+        subscription: user.subscription
+      }
+    });
+  } catch (error) {
+    console.error('Signup error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -347,7 +416,17 @@ app.post('/api/auth/login', async (req, res) => {
 
     res.json({
       message: 'Login successful',
+      access_token: token,
       token,
+      agent: {
+        id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        company: user.company,
+        subscription: user.subscription,
+        lastLogin: user.lastLogin
+      },
       user: {
         id: user._id,
         email: user.email,
@@ -802,6 +881,55 @@ app.post('/api/scan/leads', authenticateToken, async (req, res) => {
 // Homepage route - serve your website
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Serve all your website pages
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+app.get('/signup', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'signup.html'));
+});
+
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+app.get('/properties', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'properties.html'));
+});
+
+app.get('/inquiries', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'inquiries.html'));
+});
+
+app.get('/analytics', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'analytics.html'));
+});
+
+app.get('/automation', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'automation.html'));
+});
+
+app.get('/email-setup', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'email-setup.html'));
+});
+
+app.get('/email-test', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'email-test.html'));
+});
+
+app.get('/profile', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'profile.html'));
+});
+
+app.get('/calendar', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'calendar.html'));
+});
+
+app.get('/property_activity', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'property_activity.html'));
 });
 
 // Global error handler
