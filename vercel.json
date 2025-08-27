@@ -2,11 +2,31 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/index.js",
+      "src": "api/**/*.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
+    {
+      "src": "/api/auth/signup",
+      "dest": "/api/auth/signup.js"
+    },
+    {
+      "src": "/api/auth/login", 
+      "dest": "/api/auth/login.js"
+    },
+    {
+      "src": "/api/signup-test",
+      "dest": "/api/signup-test.js"
+    },
+    {
+      "src": "/api/debug-signup",
+      "dest": "/api/debug-signup.js"
+    },
+    {
+      "src": "/api/health",
+      "dest": "/api/index.js"
+    },
     {
       "src": "/api/(.*)",
       "dest": "/api/index.js"
@@ -29,7 +49,7 @@
     }
   ],
   "functions": {
-    "api/index.js": {
+    "api/**/*.js": {
       "maxDuration": 30
     }
   },
