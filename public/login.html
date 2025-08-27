@@ -187,7 +187,7 @@
 
         <div id="errorMessage" class="error-message" style="display: none;"></div>
 
-        <form id="loginForm">
+        <form id="loginForm" method="POST" action="/api/auth/login">
             <div class="form-group">
                 <label for="email">Email *</label>
                 <input 
@@ -195,7 +195,6 @@
                     id="email" 
                     name="email" 
                     required 
-                    value="npagano@besenpartners.com"
                     autocomplete="email"
                 >
             </div>
@@ -208,7 +207,6 @@
                         id="password" 
                         name="password" 
                         required 
-                        value="password123"
                         autocomplete="current-password"
                     >
                     <button type="button" class="password-toggle" onclick="togglePassword()">Show</button>
