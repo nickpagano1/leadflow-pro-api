@@ -533,6 +533,263 @@ Check browser console (F12) for technical details.\`;
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// WORKING SIGNUP FORM (using create-account endpoint)
+app.get('/api/signup', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache');
+  
+  const signupHtml = `<!DOCTYPE html>
+<html>
+<head>
+    <title>🚀 LeadFlow Pro - Create Account</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            padding: 50px;
+            width: 100%;
+            max-width: 550px;
+        }
+        h1 { 
+            text-align: center; 
+            margin-bottom: 15px; 
+            color: #333;
+            font-size: 36px;
+            font-weight: 700;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 35px;
+            font-size: 18px;
+        }
+        .form-group { margin-bottom: 25px; }
+        label { 
+            display: block; 
+            margin-bottom: 10px; 
+            font-weight: 600;
+            color: #555;
+            font-size: 16px;
+        }
+        input { 
+            width: 100%; 
+            padding: 16px; 
+            border: 2px solid #e1e1e1; 
+            border-radius: 10px; 
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+        }
+        button { 
+            width: 100%; 
+            padding: 18px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            margin-top: 10px;
+        }
+        button:hover { transform: translateY(-3px); }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result { 
+            margin-top: 30px; 
+            padding: 25px; 
+            border-radius: 10px; 
+            white-space: pre-wrap;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .success { 
+            background: #d4edda; 
+            color: #155724; 
+            border: 2px solid #c3e6cb; 
+        }
+        .error { 
+            background: #f8d7da; 
+            color: #721c24; 
+            border: 2px solid #f5c6cb; 
+        }
+        .status {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 18px;
+            background: #e8f5e8;
+            border: 3px solid #4caf50;
+            border-radius: 10px;
+            font-weight: 700;
+            color: #2e7d32;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 LeadFlow Pro</h1>
+        <div class="subtitle">Transform your business with powerful lead generation</div>
+        <div class="status">✅ FULLY WORKING SIGNUP</div>
+        
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" value="" required placeholder="you@company.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" value="John" required placeholder="John">
+            </div>
+            
+            <div class="form-group">
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" value="Doe" required placeholder="Doe">
+            </div>
+            
+            <div class="form-group">
+                <label for="company">Company:</label>
+                <input type="text" id="company" value="LeadFlow Pro" placeholder="Your Company">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password (minimum 6 characters):</label>
+                <input type="password" id="password" value="MySecurePass123!" required>
+            </div>
+            
+            <button type="submit" id="submitBtn">🚀 Create My Account</button>
+        </form>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        console.log('🎯 LeadFlow Pro WORKING Signup Page Loaded!');
+        
+        // Set unique email with timestamp
+        document.getElementById('email').value = 'user' + Date.now() + '@example.com';
+        
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const result = document.getElementById('result');
+            
+            // Reset UI
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Creating Account...';
+            result.innerHTML = '';
+            
+            // Collect form data
+            const formData = {
+                email: document.getElementById('email').value.trim(),
+                first_name: document.getElementById('firstName').value.trim(),
+                last_name: document.getElementById('lastName').value.trim(),
+                company: document.getElementById('company').value.trim(),
+                password: document.getElementById('password').value
+            };
+            
+            console.log('📤 Sending to working endpoint:', { ...formData, password: '[PROTECTED]' });
+            
+            try {
+                // Use the new working create-account endpoint
+                const response = await fetch('/api/create-account', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                console.log('📡 Response Status:', response.status);
+                const responseData = await response.json();
+                console.log('📦 Response Data:', responseData);
+                
+                if (response.ok && responseData.success) {
+                    result.className = 'result success';
+                    result.innerHTML = \`🎉 ACCOUNT CREATED SUCCESSFULLY!
+
+✅ Welcome \${responseData.user?.firstName} \${responseData.user?.lastName}!
+✅ Email: \${responseData.user?.email}
+✅ User ID: \${responseData.user?.id}
+✅ Company: \${responseData.user?.company}
+✅ Subscription: \${responseData.user?.subscription}
+✅ Token: Generated and saved securely
+
+🎯 SUCCESS! Your LeadFlow Pro account is ready!
+
+Next Steps:
+• Start capturing leads immediately
+• Set up your first campaign  
+• Integrate with your favorite tools
+• Watch your business grow!
+
+Ready to login and get started?\`;
+                    
+                    // Store authentication data
+                    if (responseData.access_token) {
+                        localStorage.setItem('access_token', responseData.access_token);
+                        localStorage.setItem('user_email', responseData.user?.email);
+                        localStorage.setItem('user_id', responseData.user?.id);
+                        localStorage.setItem('agent_id', responseData.agent_id);
+                        console.log('✅ Auth data successfully stored');
+                    }
+                } else {
+                    result.className = 'result error';
+                    result.innerHTML = \`❌ ACCOUNT CREATION FAILED
+
+Error: \${responseData.error || 'Unknown error occurred'}
+
+\${responseData.required ? 'Required fields: ' + responseData.required.join(', ') : ''}
+\${responseData.details ? '\\nDetails: ' + responseData.details : ''}\`;
+                }
+            } catch (error) {
+                console.error('💥 Network Error:', error);
+                result.className = 'result error';
+                result.innerHTML = \`💥 CONNECTION ERROR
+
+\${error.message}
+
+Please check:
+• Your internet connection
+• Try refreshing the page
+• Contact support if issue persists\`;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 Create My Account';
+            }
+        });
+    </script>
+</body>
+</html>`;
+  
+  res.status(200).send(signupHtml);
+});
+
 // Simple test endpoint
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Test endpoint works', timestamp: new Date().toISOString() });
@@ -1126,6 +1383,96 @@ app.post('/api/auth/login', asyncHandler(async (req, res) => {
     message: 'Login successful',
     access_token: token,
     token,
+    agent: {
+      id: user._id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      company: user.company,
+      subscription: user.subscription,
+      lastLogin: user.lastLogin
+    },
+    user: {
+      id: user._id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      company: user.company,
+      subscription: user.subscription,
+      lastLogin: user.lastLogin
+    }
+  });
+}));
+
+// WORKING SIGNUP ENDPOINT (based on login structure)
+app.post('/api/create-account', asyncHandler(async (req, res) => {
+  await connectDB();
+  
+  const { email, password, first_name, last_name, company, phone } = req.body;
+
+  if (!email || !password || !first_name || !last_name) {
+    return res.status(400).json({ 
+      error: 'Missing required fields',
+      required: ['email', 'password', 'first_name', 'last_name']
+    });
+  }
+
+  if (!validator.isEmail(email)) {
+    return res.status(400).json({ error: 'Invalid email format' });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'Password must be at least 6 characters' });
+  }
+
+  console.log('Account creation attempt for:', email);
+
+  // Check if user already exists
+  const existingUser = await User.findOne({ email: email.toLowerCase() });
+  if (existingUser) {
+    console.log('User already exists:', email);
+    return res.status(400).json({ error: 'Account with this email already exists' });
+  }
+
+  // Hash password
+  const saltRounds = 12;
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+  // Create new user
+  const user = new User({
+    email: email.toLowerCase(),
+    password: hashedPassword,
+    firstName: first_name,
+    lastName: last_name,
+    company: company || 'Not specified',
+    phone: phone || '',
+    subscription: 'free',
+    isActive: true
+  });
+
+  await user.save();
+  console.log('Account created successfully for:', email);
+
+  // Update last login
+  user.lastLogin = new Date();
+  await user.save();
+
+  // Generate JWT (same as login)
+  const token = jwt.sign(
+    { userId: user._id, email: user.email },
+    process.env.JWT_SECRET,
+    { expiresIn: '24h' }
+  );
+
+  console.log('Account creation successful for:', email);
+
+  res.status(201).json({
+    success: true,
+    message: 'Account created successfully',
+    access_token: token,
+    token,
+    agent_id: user._id,
+    agent_name: `${user.firstName} ${user.lastName}`,
     agent: {
       id: user._id,
       email: user.email,
