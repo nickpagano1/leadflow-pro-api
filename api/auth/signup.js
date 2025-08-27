@@ -138,18 +138,27 @@ module.exports = async (req, res) => {
     const saltRounds = 12;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Create user
+    // Create user with simplified data
+    console.log('Creating user with data:', {
+      email: email.toLowerCase(),
+      firstName: first_name,
+      lastName: last_name,
+      company: company || 'Not specified'
+    });
+
     const user = new User({
       email: email.toLowerCase(),
       password: hashedPassword,
       firstName: first_name,
       lastName: last_name,
       company: company || 'Not specified',
-      phone: phone || '5551234567',
+      phone: phone || '',
       subscription: plan || 'free'
     });
 
+    console.log('About to save user...');
     await user.save();
+    console.log('User saved successfully!');
     console.log('User created successfully:', email);
 
     // Generate JWT token
