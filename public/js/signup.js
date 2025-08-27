@@ -43,6 +43,17 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Sending data:', data);
 
         try {
+            // First test debug endpoint
+            console.log('Testing debug endpoint first...');
+            const debugResponse = await fetch('/api/auth/debug', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const debugResult = await debugResponse.json();
+            console.log('Debug result:', debugResult);
+            
+            // Now try actual signup
             const response = await fetch('/api/auth/signup', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
