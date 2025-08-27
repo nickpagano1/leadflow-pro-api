@@ -277,6 +277,259 @@ const authenticateToken = (req, res, next) => {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+  // If ?signup=true parameter, serve signup form
+  if (req.query.signup === 'true') {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache');
+    
+    const signupHtml = `<!DOCTYPE html>
+<html>
+<head>
+    <title>🚀 LeadFlow Pro - Final Working Signup</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+        }
+        h1 { 
+            text-align: center; 
+            margin-bottom: 10px; 
+            color: #333;
+            font-size: 32px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        .form-group { margin-bottom: 20px; }
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600;
+            color: #555;
+        }
+        input { 
+            width: 100%; 
+            padding: 14px; 
+            border: 2px solid #e1e1e1; 
+            border-radius: 8px; 
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        button { 
+            width: 100%; 
+            padding: 16px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        button:hover { transform: translateY(-2px); }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result { 
+            margin-top: 25px; 
+            padding: 20px; 
+            border-radius: 8px; 
+            white-space: pre-wrap;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .success { 
+            background: #d4edda; 
+            color: #155724; 
+            border: 2px solid #c3e6cb; 
+        }
+        .error { 
+            background: #f8d7da; 
+            color: #721c24; 
+            border: 2px solid #f5c6cb; 
+        }
+        .status {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #e8f5e8;
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+            font-weight: 700;
+            color: #2e7d32;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 LeadFlow Pro</h1>
+        <div class="subtitle">Join thousands of businesses growing with LeadFlow</div>
+        <div class="status">✅ FINAL WORKING SIGNUP FORM</div>
+        
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" value="" required placeholder="you@company.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" value="John" required placeholder="John">
+            </div>
+            
+            <div class="form-group">
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" value="Doe" required placeholder="Doe">
+            </div>
+            
+            <div class="form-group">
+                <label for="company">Company:</label>
+                <input type="text" id="company" value="LeadFlow Pro" placeholder="Your Company">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password (minimum 6 characters):</label>
+                <input type="password" id="password" value="SecurePass123!" required>
+            </div>
+            
+            <button type="submit" id="submitBtn">🚀 Create My Account</button>
+        </form>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        console.log('🎯 LeadFlow Pro FINAL Working Signup Loaded!');
+        
+        // Set unique email with timestamp
+        document.getElementById('email').value = 'user' + Date.now() + '@example.com';
+        
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const result = document.getElementById('result');
+            
+            // Reset UI
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Creating Account...';
+            result.innerHTML = '';
+            
+            // Collect form data
+            const formData = {
+                email: document.getElementById('email').value.trim(),
+                first_name: document.getElementById('firstName').value.trim(),
+                last_name: document.getElementById('lastName').value.trim(),
+                company: document.getElementById('company').value.trim(),
+                password: document.getElementById('password').value
+            };
+            
+            console.log('📤 Sending data:', { ...formData, password: '[HIDDEN]' });
+            
+            try {
+                // Use the working Express login endpoint structure for signup
+                const response = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                console.log('📡 Response Status:', response.status);
+                const responseData = await response.json();
+                console.log('📦 Full Response:', responseData);
+                
+                if (response.ok && responseData.success) {
+                    result.className = 'result success';
+                    result.innerHTML = \`🎉 ACCOUNT CREATED SUCCESSFULLY!
+
+✅ Welcome \${responseData.user?.firstName} \${responseData.user?.lastName}!
+✅ Email: \${responseData.user?.email}
+✅ User ID: \${responseData.user?.id || responseData.agent_id}
+✅ Company: \${responseData.user?.company}
+✅ Plan: \${responseData.user?.subscription || 'free'}
+✅ Token: Generated and saved locally
+
+🎯 SUCCESS! You can now use LeadFlow Pro!
+
+Next steps:
+• Login with your credentials
+• Start capturing leads
+• Grow your business!\`;
+                    
+                    // Store authentication data
+                    if (responseData.access_token) {
+                        localStorage.setItem('access_token', responseData.access_token);
+                        localStorage.setItem('user_email', responseData.user?.email);
+                        localStorage.setItem('user_id', responseData.user?.id || responseData.agent_id);
+                        console.log('✅ Auth data saved to localStorage');
+                    }
+                } else {
+                    result.className = 'result error';
+                    result.innerHTML = \`❌ SIGNUP FAILED
+
+Error: \${responseData.error || 'Unknown error occurred'}
+
+\${responseData.details ? 'Details: ' + responseData.details + '\\n' : ''}
+\${responseData.received ? 'Data received by server:\\n' + JSON.stringify(responseData.received, null, 2) + '\\n' : ''}
+\${responseData.debug ? 'Debug info:\\n' + JSON.stringify(responseData.debug, null, 2) : ''}\`;
+                }
+            } catch (error) {
+                console.error('💥 Network Error:', error);
+                result.className = 'result error';
+                result.innerHTML = \`💥 CONNECTION ERROR
+
+\${error.message}
+
+This usually means:
+• Network connection issue
+• Server temporarily unavailable  
+• CORS policy blocking request
+
+Check browser console (F12) for technical details.\`;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 Create My Account';
+            }
+        });
+    </script>
+</body>
+</html>`;
+    
+    return res.status(200).send(signupHtml);
+  }
+  
+  // Default health check response
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
