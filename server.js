@@ -277,8 +277,12 @@ const authenticateToken = (req, res, next) => {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  // If ?signup=true parameter, serve signup form
-  if (req.query.signup === 'true') {
+  // Check if this is a browser request by looking at User-Agent
+  const userAgent = req.headers['user-agent'] || '';
+  const isBrowser = userAgent.includes('Mozilla') || userAgent.includes('Chrome') || userAgent.includes('Safari') || userAgent.includes('Edge');
+  
+  // Serve signup form for browser requests, JSON for API calls
+  if (isBrowser) {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'no-cache');
     
@@ -455,8 +459,8 @@ app.get('/api/health', (req, res) => {
             console.log('📤 Sending data:', { ...formData, password: '[HIDDEN]' });
             
             try {
-                // Use the simple working register endpoint
-                const response = await fetch('/api/register', {
+                // Use the health endpoint for signup (POST)
+                const response = await fetch('/api/health', {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
@@ -532,6 +536,72 @@ Check browser console (F12) for technical details.\`;
   // Default health check response
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
+
+// Handle POST to health endpoint for signup
+app.post('/api/health', asyncHandler(async (req, res) => {
+  try {
+    await connectDB();
+    
+    const { email, password, first_name, last_name, company } = req.body;
+    
+    if (!email || !password || !first_name || !last_name) {
+      return res.status(400).json({ 
+        error: 'Missing required fields',
+        required: ['email', 'password', 'first_name', 'last_name'],
+        received: { email: !!email, password: !!password, first_name: !!first_name, last_name: !!last_name }
+      });
+    }
+    
+    // Check if user exists
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(400).json({ error: 'User already exists with this email' });
+    }
+    
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 12);
+    
+    // Create user
+    const newUser = new User({
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      firstName: first_name,
+      lastName: last_name,
+      company: company || 'Not specified',
+      subscription: 'free',
+      isActive: true
+    });
+    
+    const savedUser = await newUser.save();
+    
+    // Generate token
+    const token = jwt.sign(
+      { userId: savedUser._id, email: savedUser.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+    
+    res.status(201).json({
+      success: true,
+      message: 'Account created successfully!',
+      access_token: token,
+      user: {
+        id: savedUser._id,
+        email: savedUser.email,
+        firstName: savedUser.firstName,
+        lastName: savedUser.lastName,
+        company: savedUser.company
+      }
+    });
+    
+  } catch (error) {
+    console.error('Signup via health endpoint error:', error);
+    res.status(500).json({ 
+      error: 'Failed to create account',
+      details: error.message
+    });
+  }
+}));
 
 // SIMPLE WORKING SIGNUP ENDPOINT
 app.post('/api/register', asyncHandler(async (req, res) => {
