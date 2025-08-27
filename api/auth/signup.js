@@ -67,6 +67,40 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // CRITICAL: Parse body if not already parsed
+  let body = req.body;
+  if (typeof body === 'string') {
+    try {
+      body = JSON.parse(body);
+      console.log('Parsed string body to JSON');
+    } catch (e) {
+      console.log('Failed to parse body as JSON:', e.message);
+      return res.status(400).json({ error: 'Invalid JSON in request body' });
+    }
+  } else if (!body) {
+    console.log('No body found, attempting to read raw body');
+    // For some serverless platforms, we need to read the raw body
+    const chunks = [];
+    req.on('data', chunk => chunks.push(chunk));
+    req.on('end', () => {
+      try {
+        const rawBody = Buffer.concat(chunks).toString();
+        body = JSON.parse(rawBody);
+        console.log('Successfully parsed raw body');
+      } catch (e) {
+        console.log('Failed to parse raw body:', e.message);
+        return res.status(400).json({ error: 'Failed to parse request body' });
+      }
+    });
+    
+    // Wait for body parsing
+    if (!body) {
+      return new Promise((resolve) => {
+        req.on('end', () => resolve());
+      });
+    }
+  }
+
   // Debug environment variables
   console.log('Environment check:', {
     hasMongoURI: !!process.env.MONGODB_URI,
@@ -86,11 +120,11 @@ module.exports = async (req, res) => {
       retryWrites: true
     });
     
-    console.log('Raw request body:', req.body);
-    console.log('Request body type:', typeof req.body);
-    console.log('Request body keys:', req.body ? Object.keys(req.body) : 'NO BODY');
+    console.log('Raw request body:', body);
+    console.log('Request body type:', typeof body);
+    console.log('Request body keys:', body ? Object.keys(body) : 'NO BODY');
     
-    const { email, password, first_name, last_name, company, phone, plan } = req.body;
+    const { email, password, first_name, last_name, company, phone, plan } = body;
 
     console.log('Signup attempt for:', email);
     console.log('Extracted values:', { 
