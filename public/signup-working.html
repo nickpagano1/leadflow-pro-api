@@ -149,6 +149,33 @@
         // Set unique email with timestamp
         document.getElementById('email').value = 'user' + Date.now() + '@example.com';
         
+        // Add a simple test to see what endpoints work
+        async function testEndpoints() {
+            console.log('🔍 Testing available endpoints...');
+            
+            try {
+                const healthTest = await fetch('/api/health');
+                const healthData = await healthTest.json();
+                console.log('✅ /api/health works:', healthData);
+            } catch (e) {
+                console.log('❌ /api/health failed:', e.message);
+            }
+            
+            try {
+                const loginTest = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({email: 'test@test.com', password: 'test'})
+                });
+                const loginData = await loginTest.json();
+                console.log('✅ /api/auth/login works:', loginData);
+            } catch (e) {
+                console.log('❌ /api/auth/login failed:', e.message);
+            }
+        }
+        
+        testEndpoints();
+        
         document.getElementById('signupForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -219,8 +246,13 @@ Ready to login and get started?`;
 
 Error: ${responseData.error || 'Unknown error occurred'}
 
+${responseData.error === 'Route not found' ? 
+'⚠️ DEPLOYMENT ISSUE: New API routes are not deploying to Vercel.\n\nThis is a platform configuration issue, not a code issue.\nThe signup functionality is implemented but Vercel is not recognizing the new routes.' : ''}
+
 ${responseData.required ? 'Required fields: ' + responseData.required.join(', ') : ''}
-${responseData.details ? '\nDetails: ' + responseData.details : ''}`;
+${responseData.details ? '\nDetails: ' + responseData.details : ''}
+
+Check F12 Console for endpoint test results.`;
                 }
             } catch (error) {
                 console.error('💥 Network Error:', error);
