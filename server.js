@@ -38,12 +38,21 @@ app.use('/api/', limiter);
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(',') || ['https://reflows.app', 'http://localhost:3000'],
+  origin: process.env.ALLOWED_ORIGINS?.split(',') || ['https://reflows.app', 'https://www.reflows.app', 'http://localhost:3000'],
   credentials: true
 }));
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Handle www redirect - redirect www to non-www for consistency
+app.use((req, res, next) => {
+  if (req.headers.host && req.headers.host.startsWith('www.')) {
+    const nonWwwUrl = `https://${req.headers.host.substring(4)}${req.url}`;
+    return res.redirect(301, nonWwwUrl);
+  }
+  next();
+});
 
 // Serve static files
 app.use(express.static('public'));
