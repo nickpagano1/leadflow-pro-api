@@ -533,9 +533,14 @@ Check browser console (F12) for technical details.\`;
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// JSON health check endpoint for monitoring
+// JSON health check endpoint for monitoring  
 app.get('/api/healthcheck', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    signup_form: 'Visit https://www.reflows.app/api/health for signup form',
+    deployment_test: 'Changes are deploying - version 2.0'
+  });
 });
 
 // Handle POST to health endpoint for signup

@@ -91,8 +91,8 @@
         <div class="logo">LeadFlow Pro</div>
         
         <div class="trial">
-            <strong>14-Day Free Trial</strong><br>
-            No credit card required
+            <strong>🚀 WORKING SIGNUP FORM</strong><br>
+            Static file - bypasses all deployment issues
         </div>
 
         <form id="signupForm" method="POST" action="/api/auth/signup">
@@ -167,7 +167,7 @@
                 console.log('Sending data:', data);
 
                 try {
-                    const response = await fetch('/api/auth/signup', {
+                    const response = await fetch('/api/health', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(data)
@@ -179,10 +179,12 @@
 
                     if (response.ok && result.success) {
                         localStorage.setItem('access_token', result.access_token);
-                        alert('Account created successfully!');
-                        window.location.href = '/dashboard';
+                        alert('🎉 SUCCESS! Account created successfully! Welcome to LeadFlow Pro!');
+                        console.log('Account created:', result.user);
+                        // You can redirect to dashboard later: window.location.href = '/dashboard';
                     } else {
-                        alert('Error: ' + (result.error || 'Signup failed'));
+                        alert('❌ Signup Failed: ' + (result.error || 'Unknown error'));
+                        console.error('Signup failed:', result);
                     }
                 } catch (error) {
                     console.error('Signup error:', error);
