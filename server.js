@@ -281,7 +281,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Database health check endpoint
-app.get('/api/health/db', asyncHandler(async (req, res) => {
+app.get('/api/healthdb', asyncHandler(async (req, res) => {
   try {
     await connectDB();
     const dbState = mongoose.connection.readyState;
@@ -365,6 +365,12 @@ app.post('/api/auth/register', asyncHandler(async (req, res) => {
 
 // Signup endpoint (alias for register to match frontend)
 app.post('/api/auth/signup', asyncHandler(async (req, res) => {
+  console.log('=== SIGNUP REQUEST ===');
+  console.log('Method:', req.method);
+  console.log('URL:', req.url);
+  console.log('Headers:', req.headers);
+  console.log('Body:', req.body);
+  
   await connectDB();
   
   const { email, password, first_name, last_name, company, phone, plan } = req.body;
