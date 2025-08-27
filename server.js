@@ -334,6 +334,256 @@ app.get('/api/healthdb', asyncHandler(async (req, res) => {
   }
 }));
 
+// Working Signup Test Page (bypasses all routing issues)
+app.get('/api/signup-working', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache');
+  
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+    <title>🚀 LeadFlow Pro - WORKING SIGNUP</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+        }
+        h1 { 
+            text-align: center; 
+            margin-bottom: 10px; 
+            color: #333;
+            font-size: 28px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .form-group { margin-bottom: 20px; }
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600;
+            color: #555;
+        }
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid #e1e1e1; 
+            border-radius: 6px; 
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        button:hover { transform: translateY(-2px); }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result { 
+            margin-top: 25px; 
+            padding: 15px; 
+            border-radius: 6px; 
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .success { 
+            background: #d4edda; 
+            color: #155724; 
+            border: 2px solid #c3e6cb; 
+        }
+        .error { 
+            background: #f8d7da; 
+            color: #721c24; 
+            border: 2px solid #f5c6cb; 
+        }
+        .status {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #e8f5e8;
+            border: 2px solid #4caf50;
+            border-radius: 6px;
+            font-weight: 600;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 LeadFlow Pro</h1>
+        <div class="subtitle">Create Your Account</div>
+        <div class="status">✅ WORKING SIGNUP INTERFACE</div>
+        
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" value="" required placeholder="your@email.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" value="John" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" value="Doe" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="company">Company:</label>
+                <input type="text" id="company" value="LeadFlow Pro">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password (min 6 characters):</label>
+                <input type="password" id="password" value="TestPass123!" required>
+            </div>
+            
+            <button type="submit" id="submitBtn">🚀 Create Account</button>
+        </form>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        console.log('🎯 LeadFlow Pro Working Signup Loaded!');
+        
+        // Set unique email with timestamp
+        document.getElementById('email').value = 'test' + Date.now() + '@example.com';
+        
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const result = document.getElementById('result');
+            
+            // Reset UI
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Creating Account...';
+            result.innerHTML = '';
+            
+            // Collect form data
+            const formData = {
+                email: document.getElementById('email').value.trim(),
+                first_name: document.getElementById('firstName').value.trim(),
+                last_name: document.getElementById('lastName').value.trim(),
+                company: document.getElementById('company').value.trim(),
+                password: document.getElementById('password').value
+            };
+            
+            console.log('📤 Sending signup data:', { ...formData, password: '[HIDDEN]' });
+            
+            try {
+                const response = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                console.log('📡 Response Status:', response.status);
+                const responseData = await response.json();
+                console.log('📦 Response Data:', responseData);
+                
+                if (response.ok && responseData.success) {
+                    result.className = 'result success';
+                    result.innerHTML = \`🎉 SIGNUP SUCCESSFUL!
+
+✅ Welcome \${responseData.user?.firstName} \${responseData.user?.lastName}!
+✅ Email: \${responseData.user?.email}
+✅ User ID: \${responseData.user?.id || responseData.agent_id}
+✅ Token: Generated and stored locally
+✅ Subscription: \${responseData.user?.subscription || 'free'}
+
+🎯 You can now use LeadFlow Pro!
+Next: Try logging in with your credentials.\`;
+                    
+                    // Store auth token
+                    if (responseData.access_token) {
+                        localStorage.setItem('access_token', responseData.access_token);
+                        localStorage.setItem('user_email', responseData.user?.email);
+                        console.log('✅ Auth token saved to localStorage');
+                    }
+                } else {
+                    result.className = 'result error';
+                    result.innerHTML = \`❌ SIGNUP FAILED
+
+Error: \${responseData.error || 'Unknown error'}
+
+\${responseData.debug ? 'Debug Info:\\n' + JSON.stringify(responseData.debug, null, 2) : ''}
+\${responseData.received ? 'Data Received by Server:\\n' + JSON.stringify(responseData.received, null, 2) : ''}
+\${responseData.validation ? 'Validation Results:\\n' + JSON.stringify(responseData.validation, null, 2) : ''}\`;
+                }
+            } catch (error) {
+                console.error('💥 Network Error:', error);
+                result.className = 'result error';
+                result.innerHTML = \`💥 NETWORK ERROR
+
+\${error.message}
+
+Possible causes:
+• Server temporarily unavailable
+• Network connection issue
+• API endpoint not responding
+
+Check browser console (F12) for technical details.\`;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 Create Account';
+            }
+        });
+        
+        // Health check on page load
+        fetch('/api/health').then(r => r.json()).then(data => {
+            console.log('🏥 API Health Check:', data);
+        }).catch(err => {
+            console.warn('⚠️ Health check failed:', err);
+        });
+    </script>
+</body>
+</html>`;
+  
+  res.status(200).send(html);
+});
+
 // Authentication endpoints
 app.post('/api/auth/register', asyncHandler(async (req, res) => {
   await connectDB();
