@@ -7,7 +7,13 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
-    console.log('Signup form JavaScript loaded');
+    console.log('🚀 External signup.js loaded - using health endpoint');
+    
+    // Set unique email if field is empty
+    const emailField = document.getElementById('email');
+    if (emailField && !emailField.value) {
+        emailField.value = 'user' + Date.now() + '@example.com';
+    }
     
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -43,18 +49,10 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Sending data:', data);
 
         try {
-            // First test debug endpoint
-            console.log('Testing debug endpoint first...');
-            const debugResponse = await fetch('/api/auth/debug', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            const debugResult = await debugResponse.json();
-            console.log('Debug result:', debugResult);
+            console.log('🚀 Using working health endpoint for signup');
             
-            // Try the simple signup endpoint instead
-            const response = await fetch('/api/auth/signup-simple', {
+            // Use the working health endpoint
+            const response = await fetch('/api/health', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
@@ -66,12 +64,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (response.ok && result.success) {
                 localStorage.setItem('access_token', result.access_token);
-                localStorage.setItem('agent_id', result.agent_id);
-                localStorage.setItem('agent_name', result.agent_name);
-                alert('Account created successfully!');
-                window.location.href = '/dashboard';
+                localStorage.setItem('user_id', result.user?.id);
+                localStorage.setItem('user_email', result.user?.email);
+                alert('🎉 SUCCESS! Account created successfully! Welcome ' + (result.user?.firstName || 'User') + '!');
+                console.log('Account created:', result.user);
+                // You can redirect later: window.location.href = '/dashboard';
             } else {
-                alert('Error: ' + (result.error || result.detail || 'Signup failed'));
+                alert('❌ Signup Failed: ' + (result.error || 'Unknown error'));
+                console.error('Signup failed:', result);
             }
         } catch (error) {
             console.error('Signup error:', error);
