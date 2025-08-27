@@ -83,10 +83,11 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 module.exports = async (req, res) => {
-  // Set CORS headers
+  // BULLETPROOF CORS HEADERS
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Content-Type', 'application/json');
   
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -98,69 +99,192 @@ module.exports = async (req, res) => {
 
   try {
     await connectDB();
+    
+    console.log('🚀 BULLETPROOF LOGIN/SIGNUP ENDPOINT - Request received');
+    console.log('📦 Request body keys:', Object.keys(req.body || {}));
 
-    const { email, password } = req.body;
+    const { 
+      email, 
+      password, 
+      first_name, 
+      last_name, 
+      firstName, 
+      lastName,
+      company,
+      phone,
+      plan,
+      subscription 
+    } = req.body;
 
+    // BASIC VALIDATION
     if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password required' });
+      console.log('❌ Missing email or password');
+      return res.status(400).json({ 
+        error: 'Email and password are required',
+        required: ['email', 'password'],
+        received: Object.keys(req.body || {})
+      });
     }
 
     if (!validator.isEmail(email)) {
+      console.log('❌ Invalid email format:', email);
       return res.status(400).json({ error: 'Invalid email format' });
     }
 
-    // Find user
-    const user = await User.findOne({ email: email.toLowerCase() })
+    if (password.length < 6) {
+      console.log('❌ Password too short');
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
+    // DETERMINE IF THIS IS LOGIN OR SIGNUP
+    const isSignupRequest = first_name || firstName || last_name || lastName || company;
+    console.log('🔍 Request type:', isSignupRequest ? 'SIGNUP' : 'LOGIN');
+
+    // FIND EXISTING USER
+    let user = await User.findOne({ email: email.toLowerCase() })
       .select('+password');
 
-    if (!user) {
-      return res.status(400).json({ error: 'Invalid credentials' });
+    if (isSignupRequest) {
+      // SIGNUP FLOW
+      console.log('📝 Processing SIGNUP request');
+      
+      // Check if user already exists
+      if (user) {
+        console.log('❌ User already exists:', email);
+        return res.status(400).json({ 
+          error: 'User already exists with this email address',
+          suggestion: 'Try logging in instead, or use a different email'
+        });
+      }
+      
+      // Validate signup fields
+      const finalFirstName = first_name || firstName;
+      const finalLastName = last_name || lastName;
+      
+      if (!finalFirstName || !finalLastName) {
+        console.log('❌ Missing required signup fields');
+        return res.status(400).json({ 
+          error: 'First name and last name are required for signup',
+          required: ['email', 'password', 'first_name', 'last_name'],
+          received: Object.keys(req.body || {})
+        });
+      }
+
+      // Hash password
+      console.log('🔐 Hashing password for new user');
+      const hashedPassword = await bcrypt.hash(password, 12);
+
+      // Create new user
+      console.log('👤 Creating new user account');
+      user = new User({
+        email: email.toLowerCase(),
+        password: hashedPassword,
+        firstName: finalFirstName.trim(),
+        lastName: finalLastName.trim(),
+        company: (company || '').trim(),
+        phone: (phone || '').trim(),
+        subscription: subscription || plan || 'free',
+        lastLogin: new Date(),
+        isActive: true
+      });
+
+      await user.save();
+      console.log('✅ NEW USER CREATED:', user._id);
+
+    } else {
+      // LOGIN FLOW
+      console.log('🔑 Processing LOGIN request');
+      
+      if (!user) {
+        console.log('❌ User not found:', email);
+        return res.status(400).json({ 
+          error: 'Invalid credentials',
+          hint: 'User not found. Try signing up first.'
+        });
+      }
+
+      // Verify password
+      console.log('🔐 Verifying password');
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        console.log('❌ Invalid password for:', email);
+        return res.status(400).json({ error: 'Invalid credentials' });
+      }
+
+      // Update last login
+      user.lastLogin = new Date();
+      await user.save();
+      console.log('✅ LOGIN SUCCESSFUL for:', email);
     }
 
-    // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(400).json({ error: 'Invalid credentials' });
-    }
-
-    // Update last login
-    user.lastLogin = new Date();
-    await user.save();
-
-    // Generate JWT token
+    // GENERATE JWT TOKEN (for both login and signup)
     const token = jwt.sign(
-      { userId: user._id, email: user.email },
-      process.env.JWT_SECRET,
+      { 
+        userId: user._id, 
+        email: user.email,
+        type: isSignupRequest ? 'signup' : 'login'
+      },
+      process.env.JWT_SECRET || 'fallback-secret-key',
       { expiresIn: '24h' }
     );
 
-    console.log('Login successful for:', email);
+    // PREPARE SUCCESS RESPONSE
+    const userResponse = {
+      id: user._id.toString(),
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      company: user.company || '',
+      phone: user.phone || '',
+      subscription: user.subscription,
+      lastLogin: user.lastLogin,
+      isActive: user.isActive
+    };
 
-    res.json({
-      message: 'Login successful',
+    const responseData = {
+      success: true,
+      message: isSignupRequest ? '🎉 Account created successfully!' : '🔑 Login successful!',
+      operation: isSignupRequest ? 'signup' : 'login',
       access_token: token,
-      token,
-      agent: {
-        id: user._id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        company: user.company,
-        subscription: user.subscription,
-        lastLogin: user.lastLogin
-      },
-      user: {
-        id: user._id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        company: user.company,
-        subscription: user.subscription,
-        lastLogin: user.lastLogin
-      }
-    });
+      token: token, // For compatibility
+      agent_id: user._id.toString(), // For compatibility
+      user: userResponse,
+      agent: userResponse, // For compatibility
+      timestamp: new Date().toISOString()
+    };
+
+    console.log('🎉 SUCCESS! Operation:', isSignupRequest ? 'SIGNUP' : 'LOGIN');
+    console.log('✅ User ID:', user._id);
+    console.log('✅ Email:', user.email);
+
+    return res.status(200).json(responseData);
+
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: 'Internal server error during login' });
+    console.error('💥 BULLETPROOF ENDPOINT ERROR:', error);
+    
+    // DETAILED ERROR HANDLING
+    let errorMessage = 'Internal server error';
+    let statusCode = 500;
+    
+    if (error.code === 11000) {
+      // Duplicate key error (email already exists)
+      errorMessage = 'Email address already exists';
+      statusCode = 400;
+      console.log('❌ Duplicate email error');
+    } else if (error.name === 'ValidationError') {
+      errorMessage = 'Validation error: ' + Object.values(error.errors).map(e => e.message).join(', ');
+      statusCode = 400;
+      console.log('❌ Validation error:', errorMessage);
+    } else if (error.name === 'MongooseError') {
+      errorMessage = 'Database error';
+      console.log('❌ MongoDB error:', error.message);
+    }
+
+    return res.status(statusCode).json({ 
+      error: errorMessage,
+      details: process.env.NODE_ENV === 'development' ? error.message : 'Contact support if issue persists',
+      operation: 'bulletproof-auth',
+      timestamp: new Date().toISOString()
+    });
   }
 };
