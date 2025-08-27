@@ -96,6 +96,13 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // Debug environment variables
+  console.log('Environment check:', {
+    hasMongoURI: !!process.env.MONGODB_URI,
+    hasJWTSecret: !!process.env.JWT_SECRET,
+    nodeEnv: process.env.NODE_ENV
+  });
+
   try {
     await connectDB();
     
