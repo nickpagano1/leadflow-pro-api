@@ -3,20 +3,32 @@ const app = express();
 
 app.use(express.json());
 
-// Put simple route FIRST to test order dependency
-app.get('/api/simple', (req, res) => {
+// Test non-API paths
+app.get('/test', (req, res) => {
   res.json({ 
     status: 'OK', 
-    message: 'Simple endpoint working - defined FIRST',
+    message: 'Non-API test endpoint working',
+    path: '/test',
     timestamp: new Date().toISOString() 
   });
 });
 
-// Health route SECOND
+// Test different API path
+app.get('/api/different', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'Different API endpoint working',
+    path: '/api/different',
+    timestamp: new Date().toISOString() 
+  });
+});
+
+// Keep health route for comparison
 app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
-    message: 'Health endpoint working - defined SECOND',
+    message: 'Health endpoint working',
+    path: '/api/health',
     timestamp: new Date().toISOString() 
   });
 });
