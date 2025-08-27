@@ -45,14 +45,7 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Handle www redirect - redirect www to non-www for consistency
-app.use((req, res, next) => {
-  if (req.headers.host && req.headers.host.startsWith('www.')) {
-    const nonWwwUrl = `https://${req.headers.host.substring(4)}${req.url}`;
-    return res.redirect(301, nonWwwUrl);
-  }
-  next();
-});
+// Note: www redirect handled at DNS/Vercel level
 
 // Serve static files
 app.use(express.static('public'));
