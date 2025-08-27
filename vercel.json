@@ -13,10 +13,7 @@
     },
     {
       "src": "/js/(.*)",
-      "dest": "/js/$1",
-      "headers": {
-        "Content-Type": "application/javascript"
-      }
+      "dest": "/api/js"
     },
     {
       "src": "/css/(.*)",
