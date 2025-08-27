@@ -57,11 +57,150 @@ module.exports = async (req, res) => {
   try {
     // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     
     if (req.method === 'OPTIONS') {
       return res.status(200).end();
+    }
+    
+    // Serve test form on GET request
+    if (req.method === 'GET') {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-cache');
+      
+      const testForm = \`<!DOCTYPE html>
+<html>
+<head>
+    <title>LeadFlow Pro Signup Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 500px; margin: 50px auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #000; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #333; }
+        .result { margin-top: 20px; padding: 10px; border-radius: 4px; white-space: pre-wrap; font-family: monospace; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    </style>
+</head>
+<body>
+    <h1>🎯 LeadFlow Pro Signup Test</h1>
+    <p><strong>This form tests the actual signup API!</strong></p>
+    <p class="info" style="padding: 10px; border-radius: 4px;">Form is pre-filled with test data. Click "Create Account" to test the signup functionality.</p>
+    
+    <form id="signupTest">
+        <div class="form-group">
+            <label>Email:</label>
+            <input type="email" id="email" value="test\${Date.now()}@example.com" required>
+        </div>
+        
+        <div class="form-group">
+            <label>First Name:</label>
+            <input type="text" id="firstName" value="Test" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Last Name:</label>
+            <input type="text" id="lastName" value="User" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Company:</label>
+            <input type="text" id="company" value="LeadFlow Pro" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Password:</label>
+            <input type="password" id="password" value="TestPassword123!" required>
+        </div>
+        
+        <button type="submit" id="submitBtn">Create Account</button>
+    </form>
+    
+    <div id="result"></div>
+
+    <script>
+        console.log('🎯 Signup test form loaded!');
+        
+        document.getElementById('signupTest').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const result = document.getElementById('result');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Testing...';
+            result.innerHTML = '';
+            
+            const data = {
+                email: document.getElementById('email').value,
+                first_name: document.getElementById('firstName').value,
+                last_name: document.getElementById('lastName').value,
+                company: document.getElementById('company').value,
+                password: document.getElementById('password').value
+            };
+            
+            console.log('📤 Sending signup data:', data);
+            
+            try {
+                const response = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                console.log('📡 Response status:', response.status);
+                const responseData = await response.json();
+                console.log('📦 Response data:', responseData);
+                
+                if (response.ok && responseData.success) {
+                    result.className = 'result success';
+                    result.innerHTML = \`🎉 SUCCESS!
+
+Account created successfully!
+✅ User ID: \${responseData.user?.id || 'N/A'}
+✅ Email: \${responseData.user?.email || 'N/A'}
+✅ Token: \${responseData.access_token ? 'Generated' : 'Missing'}
+
+You can now proceed to test login!\`;
+                    
+                    if (responseData.access_token) {
+                        localStorage.setItem('access_token', responseData.access_token);
+                        console.log('✅ Token saved to localStorage');
+                    }
+                } else {
+                    result.className = 'result error';
+                    result.innerHTML = \`❌ SIGNUP FAILED
+
+Error: \${responseData.error || 'Unknown error'}
+
+Full response:
+\${JSON.stringify(responseData, null, 2)}\`;
+                }
+            } catch (error) {
+                console.error('💥 Error:', error);
+                result.className = 'result error';
+                result.innerHTML = \`💥 NETWORK ERROR
+
+\${error.message}
+
+Check the browser console (F12) for more details.\`;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Account';
+            }
+        });
+    </script>
+</body>
+</html>\`;
+      
+      return res.status(200).send(testForm);
     }
     
     if (req.method !== 'POST') {
