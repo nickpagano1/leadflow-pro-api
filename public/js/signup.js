@@ -53,8 +53,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const debugResult = await debugResponse.json();
             console.log('Debug result:', debugResult);
             
-            // Now try actual signup
-            const response = await fetch('/api/auth/signup', {
+            // Try the simple signup endpoint instead
+            const response = await fetch('/api/auth/signup-simple', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
