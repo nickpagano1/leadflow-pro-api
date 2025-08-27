@@ -50,26 +50,31 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Serve static files
 app.use(express.static('public'));
 
-// MongoDB connection with connection pooling for serverless
-let isConnected = false;
+// Optimized MongoDB connection for serverless
+let cachedConnection = null;
 
 const connectDB = async () => {
-  if (isConnected) {
-    return;
+  if (cachedConnection && mongoose.connection.readyState === 1) {
+    return cachedConnection;
   }
   
   try {
-    await mongoose.connect(process.env.MONGODB_URI, {
+    const connection = await mongoose.connect(process.env.MONGODB_URI, {
       bufferCommands: false,
-      maxPoolSize: 10,
+      maxPoolSize: 1, // Single connection for serverless
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
+      family: 4, // Use IPv4
+      maxIdleTimeMS: 30000,
+      retryWrites: true
     });
-    isConnected = true;
+    
+    cachedConnection = connection;
     console.log('MongoDB connected successfully');
+    return connection;
   } catch (error) {
     console.error('MongoDB connection error:', error);
-    throw error;
+    throw new Error(`Database connection failed: ${error.message}`);
   }
 };
 
@@ -271,228 +276,217 @@ app.get('/api/health', (req, res) => {
 });
 
 // Authentication endpoints
-app.post('/api/auth/register', async (req, res) => {
-  try {
-    const { email, password, firstName, lastName, company, phone } = req.body;
+app.post('/api/auth/register', asyncHandler(async (req, res) => {
+  await connectDB();
+  
+  const { email, password, firstName, lastName, company, phone } = req.body;
 
-    // Validation
-    if (!email || !password || !firstName || !lastName) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    if (!validator.isEmail(email)) {
-      return res.status(400).json({ error: 'Invalid email format' });
-    }
-
-    if (password.length < 6) {
-      return res.status(400).json({ error: 'Password must be at least 6 characters' });
-    }
-
-    // Check if user exists
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
-    if (existingUser) {
-      return res.status(400).json({ error: 'User already exists' });
-    }
-
-    // Hash password
-    const saltRounds = 12;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-    // Create user
-    const user = new User({
-      email: email.toLowerCase(),
-      password: hashedPassword,
-      firstName,
-      lastName,
-      company,
-      phone
-    });
-
-    await user.save();
-
-    // Generate JWT
-    const token = jwt.sign(
-      { userId: user._id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
-    res.status(201).json({
-      message: 'User registered successfully',
-      token,
-      user: {
-        id: user._id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        company: user.company,
-        subscription: user.subscription
-      }
-    });
-  } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+  // Validation
+  if (!email || !password || !firstName || !lastName) {
+    return res.status(400).json({ error: 'Missing required fields' });
   }
-});
+
+  if (!validator.isEmail(email)) {
+    return res.status(400).json({ error: 'Invalid email format' });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'Password must be at least 6 characters' });
+  }
+
+  // Check if user exists
+  const existingUser = await User.findOne({ email: email.toLowerCase() });
+  if (existingUser) {
+    return res.status(400).json({ error: 'User already exists' });
+  }
+
+  // Hash password
+  const saltRounds = 12;
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+  // Create user
+  const user = new User({
+    email: email.toLowerCase(),
+    password: hashedPassword,
+    firstName,
+    lastName,
+    company,
+    phone: phone || '5551234567'
+  });
+
+  await user.save();
+
+  // Generate JWT
+  const token = jwt.sign(
+    { userId: user._id, email: user.email },
+    process.env.JWT_SECRET,
+    { expiresIn: '24h' }
+  );
+
+  res.status(201).json({
+    message: 'User registered successfully',
+    token,
+    user: {
+      id: user._id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      company: user.company,
+      subscription: user.subscription
+    }
+  });
+}));
 
 // Signup endpoint (alias for register to match frontend)
-app.post('/api/auth/signup', async (req, res) => {
-  try {
-    // Connect to MongoDB
-    await connectDB();
-    
-    const { email, password, first_name, last_name, company, phone, plan } = req.body;
+app.post('/api/auth/signup', asyncHandler(async (req, res) => {
+  await connectDB();
+  
+  const { email, password, first_name, last_name, company, phone, plan } = req.body;
 
-    console.log('Signup attempt for:', email);
-    console.log('Received data:', { email, first_name, last_name, company, has_password: !!password });
+  console.log('Signup attempt for:', email);
+  console.log('Received data:', { email, first_name, last_name, company, has_password: !!password });
 
-    // Validation
-    if (!email || !password || !first_name || !last_name) {
-      console.log('Missing required fields:', { email: !!email, password: !!password, first_name: !!first_name, last_name: !!last_name });
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    if (!validator.isEmail(email)) {
-      console.log('Invalid email format:', email);
-      return res.status(400).json({ error: 'Invalid email format' });
-    }
-
-    if (password.length < 6) {
-      console.log('Password too short:', password.length);
-      return res.status(400).json({ error: 'Password must be at least 6 characters' });
-    }
-
-    // Check if user exists
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
-    if (existingUser) {
-      console.log('User already exists:', email);
-      return res.status(400).json({ error: 'User already exists' });
-    }
-
-    // Hash password
-    const saltRounds = 12;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-    // Create user
-    const user = new User({
-      email: email.toLowerCase(),
-      password: hashedPassword,
-      firstName: first_name,
-      lastName: last_name,
-      company,
-      phone: phone || '5551234567',
-      subscription: plan || 'premium'
-    });
-
-    await user.save();
-    console.log('User created successfully:', user._id);
-
-    // Generate JWT
-    const token = jwt.sign(
-      { userId: user._id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
-    res.status(201).json({
-      success: true,
-      message: 'User registered successfully',
-      access_token: token,
-      agent_id: user._id,
-      agent_name: `${user.firstName} ${user.lastName}`,
-      user: {
-        id: user._id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        company: user.company,
-        subscription: user.subscription
-      }
-    });
-  } catch (error) {
-    console.error('Signup error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
-    res.status(500).json({ 
-      error: 'Internal server error',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+  // Validation
+  if (!email || !password || !first_name || !last_name) {
+    console.log('Missing required fields:', { email: !!email, password: !!password, first_name: !!first_name, last_name: !!last_name });
+    return res.status(400).json({ error: 'Missing required fields' });
   }
-});
 
-app.post('/api/auth/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password required' });
-    }
-
-    // Find user
-    const user = await User.findOne({ email: email.toLowerCase() });
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    if (!user.isActive) {
-      return res.status(401).json({ error: 'Account is deactivated' });
-    }
-
-    // Check password
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    // Update last login
-    user.lastLogin = new Date();
-    await user.save();
-
-    // Generate JWT
-    const token = jwt.sign(
-      { userId: user._id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
-    res.json({
-      message: 'Login successful',
-      access_token: token,
-      token,
-      agent: {
-        id: user._id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        company: user.company,
-        subscription: user.subscription,
-        lastLogin: user.lastLogin
-      },
-      user: {
-        id: user._id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        company: user.company,
-        subscription: user.subscription,
-        lastLogin: user.lastLogin
-      }
-    });
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+  if (!validator.isEmail(email)) {
+    console.log('Invalid email format:', email);
+    return res.status(400).json({ error: 'Invalid email format' });
   }
-});
+
+  if (password.length < 6) {
+    console.log('Password too short:', password.length);
+    return res.status(400).json({ error: 'Password must be at least 6 characters' });
+  }
+
+  // Check if user exists
+  const existingUser = await User.findOne({ email: email.toLowerCase() });
+  if (existingUser) {
+    console.log('User already exists:', email);
+    return res.status(400).json({ error: 'User already exists' });
+  }
+
+  // Hash password
+  const saltRounds = 12;
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+  // Create user
+  const user = new User({
+    email: email.toLowerCase(),
+    password: hashedPassword,
+    firstName: first_name,
+    lastName: last_name,
+    company,
+    phone: phone || '5551234567',
+    subscription: plan || 'premium'
+  });
+
+  await user.save();
+  console.log('User created successfully:', user._id);
+
+  // Generate JWT
+  const token = jwt.sign(
+    { userId: user._id, email: user.email },
+    process.env.JWT_SECRET,
+    { expiresIn: '24h' }
+  );
+
+  res.status(201).json({
+    success: true,
+    message: 'User registered successfully',
+    access_token: token,
+    agent_id: user._id,
+    agent_name: `${user.firstName} ${user.lastName}`,
+    user: {
+      id: user._id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      company: user.company,
+      subscription: user.subscription
+    }
+  });
+}));
+
+app.post('/api/auth/login', asyncHandler(async (req, res) => {
+  await connectDB();
+  
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password required' });
+  }
+
+  console.log('Login attempt for:', email);
+
+  // Find user
+  const user = await User.findOne({ email: email.toLowerCase() });
+  if (!user) {
+    console.log('User not found:', email);
+    return res.status(401).json({ error: 'Invalid credentials' });
+  }
+
+  if (!user.isActive) {
+    console.log('User account deactivated:', email);
+    return res.status(401).json({ error: 'Account is deactivated' });
+  }
+
+  // Check password
+  const isValidPassword = await bcrypt.compare(password, user.password);
+  if (!isValidPassword) {
+    console.log('Invalid password for:', email);
+    return res.status(401).json({ error: 'Invalid credentials' });
+  }
+
+  // Update last login
+  user.lastLogin = new Date();
+  await user.save();
+
+  // Generate JWT
+  const token = jwt.sign(
+    { userId: user._id, email: user.email },
+    process.env.JWT_SECRET,
+    { expiresIn: '24h' }
+  );
+
+  console.log('Login successful for:', email);
+
+  res.json({
+    message: 'Login successful',
+    access_token: token,
+    token,
+    agent: {
+      id: user._id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      company: user.company,
+      subscription: user.subscription,
+      lastLogin: user.lastLogin
+    },
+    user: {
+      id: user._id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      company: user.company,
+      subscription: user.subscription,
+      lastLogin: user.lastLogin
+    }
+  });
+}));
 
 // Email configuration endpoints
-app.post('/api/email/config', authenticateToken, async (req, res) => {
-  try {
-    const { provider, email, host, port, secure, username, password } = req.body;
+app.post('/api/email/config', authenticateToken, asyncHandler(async (req, res) => {
+  await connectDB();
+  
+  const { provider, email, host, port, secure, username, password } = req.body;
 
-    if (!provider || !email) {
-      return res.status(400).json({ error: 'Provider and email are required' });
+  if (!provider || !email) {
+    return res.status(400).json({ error: 'Provider and email are required' });
     }
 
     if (!validator.isEmail(email)) {
@@ -533,8 +527,8 @@ app.post('/api/email/config', authenticateToken, async (req, res) => {
   }
 });
 
-app.get('/api/email/config', authenticateToken, async (req, res) => {
-  try {
+app.get('/api/email/config', authenticateToken, asyncHandler(async (req, res) => {
+  await connectDB();
     const config = await EmailConfig.findOne({ userId: req.user.userId });
     
     if (!config) {
@@ -558,8 +552,8 @@ app.get('/api/email/config', authenticateToken, async (req, res) => {
   }
 });
 
-app.post('/api/email/test', authenticateToken, async (req, res) => {
-  try {
+app.post('/api/email/test', authenticateToken, asyncHandler(async (req, res) => {
+  await connectDB();
     const config = await EmailConfig.findOne({ userId: req.user.userId });
     
     if (!config) {
@@ -594,8 +588,8 @@ app.post('/api/email/test', authenticateToken, async (req, res) => {
 });
 
 // Lead management endpoints
-app.post('/api/leads', authenticateToken, async (req, res) => {
-  try {
+app.post('/api/leads', authenticateToken, asyncHandler(async (req, res) => {
+  await connectDB();
     const { email, firstName, lastName, company, phone, source, tags, notes, value } = req.body;
 
     if (!email) {
@@ -631,8 +625,8 @@ app.post('/api/leads', authenticateToken, async (req, res) => {
   }
 });
 
-app.get('/api/leads', authenticateToken, async (req, res) => {
-  try {
+app.get('/api/leads', authenticateToken, asyncHandler(async (req, res) => {
+  await connectDB();
     const { page = 1, limit = 50, status, source, search } = req.query;
     
     const query = { userId: req.user.userId };
@@ -672,8 +666,8 @@ app.get('/api/leads', authenticateToken, async (req, res) => {
 });
 
 // Automation endpoints
-app.post('/api/campaigns', authenticateToken, async (req, res) => {
-  try {
+app.post('/api/campaigns', authenticateToken, asyncHandler(async (req, res) => {
+  await connectDB();
     const { name, subject, content, recipients, scheduledAt } = req.body;
 
     if (!name || !subject || !content) {
@@ -701,8 +695,8 @@ app.post('/api/campaigns', authenticateToken, async (req, res) => {
   }
 });
 
-app.get('/api/campaigns', authenticateToken, async (req, res) => {
-  try {
+app.get('/api/campaigns', authenticateToken, asyncHandler(async (req, res) => {
+  await connectDB();
     const campaigns = await Campaign.find({ userId: req.user.userId })
       .sort({ createdAt: -1 });
 
@@ -713,8 +707,8 @@ app.get('/api/campaigns', authenticateToken, async (req, res) => {
   }
 });
 
-app.post('/api/campaigns/:id/send', authenticateToken, async (req, res) => {
-  try {
+app.post('/api/campaigns/:id/send', authenticateToken, asyncHandler(async (req, res) => {
+  await connectDB();
     const campaign = await Campaign.findOne({
       _id: req.params.id,
       userId: req.user.userId
@@ -792,8 +786,8 @@ app.post('/api/campaigns/:id/send', authenticateToken, async (req, res) => {
 });
 
 // User profile endpoints
-app.get('/api/profile', authenticateToken, async (req, res) => {
-  try {
+app.get('/api/profile', authenticateToken, asyncHandler(async (req, res) => {
+  await connectDB();
     const user = await User.findById(req.user.userId).select('-password');
     
     if (!user) {
@@ -807,8 +801,8 @@ app.get('/api/profile', authenticateToken, async (req, res) => {
   }
 });
 
-app.put('/api/profile', authenticateToken, async (req, res) => {
-  try {
+app.put('/api/profile', authenticateToken, asyncHandler(async (req, res) => {
+  await connectDB();
     const { firstName, lastName, company, phone } = req.body;
 
     const user = await User.findByIdAndUpdate(
@@ -833,8 +827,8 @@ app.put('/api/profile', authenticateToken, async (req, res) => {
 });
 
 // Stats endpoints
-app.get('/api/stats', authenticateToken, async (req, res) => {
-  try {
+app.get('/api/stats', authenticateToken, asyncHandler(async (req, res) => {
+  await connectDB();
     const totalLeads = await Lead.countDocuments({ userId: req.user.userId });
     const newLeads = await Lead.countDocuments({ 
       userId: req.user.userId, 
@@ -881,8 +875,8 @@ app.get('/api/stats', authenticateToken, async (req, res) => {
 });
 
 // Lead scanning endpoint
-app.post('/api/scan/leads', authenticateToken, async (req, res) => {
-  try {
+app.post('/api/scan/leads', authenticateToken, asyncHandler(async (req, res) => {
+  await connectDB();
     const { source, criteria } = req.body;
 
     if (!source) {
@@ -975,15 +969,62 @@ app.get('/property_activity', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'property_activity.html'));
 });
 
-// Global error handler
+// Async error wrapper
+const asyncHandler = (fn) => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};
+
+// Global error handler with detailed logging
 app.use((error, req, res, next) => {
-  console.error('Unhandled error:', error);
-  res.status(500).json({ error: 'Internal server error' });
+  console.error('Error Details:', {
+    message: error.message,
+    stack: error.stack,
+    url: req.url,
+    method: req.method,
+    body: req.body,
+    timestamp: new Date().toISOString()
+  });
+
+  // Database connection errors
+  if (error.name === 'MongoError' || error.name === 'MongooseError') {
+    return res.status(503).json({ 
+      error: 'Database connection error',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+
+  // Validation errors
+  if (error.name === 'ValidationError') {
+    return res.status(400).json({ 
+      error: 'Validation error',
+      details: Object.values(error.errors).map(e => e.message)
+    });
+  }
+
+  // JWT errors
+  if (error.name === 'JsonWebTokenError') {
+    return res.status(401).json({ error: 'Invalid token' });
+  }
+
+  // Default error
+  res.status(error.status || 500).json({ 
+    error: error.message || 'Internal server error',
+    details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+  });
 });
 
-// 404 handler
+// 404 handler for API routes
+app.use('/api/*', (req, res) => {
+  res.status(404).json({ error: `API endpoint ${req.path} not found` });
+});
+
+// 404 handler for pages - redirect to home
 app.use('*', (req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+  if (req.path.startsWith('/api/')) {
+    res.status(404).json({ error: 'Route not found' });
+  } else {
+    res.redirect('/');
+  }
 });
 
 // Start server
