@@ -378,7 +378,8 @@ app.post('/api/auth/signup', asyncHandler(async (req, res) => {
   
   await connectDB();
   
-  const { email, password, first_name, last_name, company, phone, plan } = req.body;
+  try {
+    const { email, password, first_name, last_name, company, phone, plan } = req.body;
 
   console.log('Signup attempt for:', email);
   console.log('Received data:', { email, first_name, last_name, company, has_password: !!password });
@@ -520,10 +521,11 @@ app.post('/api/auth/login', asyncHandler(async (req, res) => {
 app.post('/api/email/config', authenticateToken, asyncHandler(async (req, res) => {
   await connectDB();
   
-  const { provider, email, host, port, secure, username, password } = req.body;
+  try {
+    const { provider, email, host, port, secure, username, password } = req.body;
 
-  if (!provider || !email) {
-    return res.status(400).json({ error: 'Provider and email are required' });
+    if (!provider || !email) {
+      return res.status(400).json({ error: 'Provider and email are required' });
     }
 
     if (!validator.isEmail(email)) {
@@ -562,10 +564,12 @@ app.post('/api/email/config', authenticateToken, asyncHandler(async (req, res) =
     console.error('Email config error:', error);
     res.status(500).json({ error: 'Failed to save email configuration' });
   }
-});
+}));
 
 app.get('/api/email/config', authenticateToken, asyncHandler(async (req, res) => {
   await connectDB();
+  
+  try {
     const config = await EmailConfig.findOne({ userId: req.user.userId });
     
     if (!config) {
@@ -587,7 +591,7 @@ app.get('/api/email/config', authenticateToken, asyncHandler(async (req, res) =>
     console.error('Get email config error:', error);
     res.status(500).json({ error: 'Failed to retrieve email configuration' });
   }
-});
+}));
 
 app.post('/api/email/test', authenticateToken, asyncHandler(async (req, res) => {
   await connectDB();
