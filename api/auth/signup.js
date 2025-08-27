@@ -54,59 +54,41 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 module.exports = async (req, res) => {
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  // CRITICAL: Parse body if not already parsed
-  let body = req.body;
-  if (typeof body === 'string') {
-    try {
-      body = JSON.parse(body);
-      console.log('Parsed string body to JSON');
-    } catch (e) {
-      console.log('Failed to parse body as JSON:', e.message);
-      return res.status(400).json({ error: 'Invalid JSON in request body' });
-    }
-  } else if (!body) {
-    console.log('No body found, attempting to read raw body');
-    // For some serverless platforms, we need to read the raw body
-    const chunks = [];
-    req.on('data', chunk => chunks.push(chunk));
-    req.on('end', () => {
-      try {
-        const rawBody = Buffer.concat(chunks).toString();
-        body = JSON.parse(rawBody);
-        console.log('Successfully parsed raw body');
-      } catch (e) {
-        console.log('Failed to parse raw body:', e.message);
-        return res.status(400).json({ error: 'Failed to parse request body' });
-      }
-    });
+  try {
+    // Set CORS headers
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     
-    // Wait for body parsing
-    if (!body) {
-      return new Promise((resolve) => {
-        req.on('end', () => resolve());
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
+    
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    // Simple body handling - req.body should be parsed by Vercel
+    let body = req.body;
+    
+    console.log('=== SIGNUP REQUEST DEBUG ===');
+    console.log('Raw body:', body);
+    console.log('Body type:', typeof body);
+    console.log('Body keys:', body ? Object.keys(body) : 'NO KEYS');
+    
+    // If body is empty or null, return detailed error
+    if (!body || Object.keys(body).length === 0) {
+      return res.status(400).json({
+        error: 'No request body received',
+        debug: {
+          bodyReceived: body,
+          bodyType: typeof body,
+          hasBody: !!body,
+          method: req.method,
+          contentType: req.headers['content-type']
+        }
       });
     }
-  }
-
-  // Debug environment variables
-  console.log('Environment check:', {
-    hasMongoURI: !!process.env.MONGODB_URI,
-    hasJWTSecret: !!process.env.JWT_SECRET,
-    nodeEnv: process.env.NODE_ENV
-  });
 
   try {
     // Connect to MongoDB (same as login)
@@ -135,10 +117,25 @@ module.exports = async (req, res) => {
       password: password ? 'PROVIDED' : 'MISSING'
     });
 
-    // Validation
+    // Validation with detailed error info
     if (!email || !password || !first_name || !last_name) {
       console.log('Missing required fields:', { email: !!email, password: !!password, first_name: !!first_name, last_name: !!last_name });
-      return res.status(400).json({ error: 'Missing required fields' });
+      return res.status(400).json({ 
+        error: 'Missing required fields',
+        received: {
+          email: email || null,
+          first_name: first_name || null,
+          last_name: last_name || null,
+          password: password ? '[PROVIDED]' : null,
+          company: company || null
+        },
+        validation: {
+          email: !!email,
+          password: !!password,
+          first_name: !!first_name,
+          last_name: !!last_name
+        }
+      });
     }
 
     if (!validator.isEmail(email)) {
