@@ -174,7 +174,8 @@ module.exports = async (req, res) => {
     console.error('Error stack:', error.stack);
     res.status(500).json({ 
       error: 'Internal server error during signup',
-      details: process.env.NODE_ENV === 'development' ? error.message : 'Contact support'
+      details: error.message,
+      type: error.name
     });
   }
 };
