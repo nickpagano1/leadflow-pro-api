@@ -50,6 +50,11 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Serve static files
 app.use(express.static('public'));
 
+// Async error wrapper - defined before routes that use it
+const asyncHandler = (fn) => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};
+
 // Optimized MongoDB connection for serverless
 let cachedConnection = null;
 
@@ -969,11 +974,6 @@ app.get('/property_activity', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'property_activity.html'));
 });
 
-// Async error wrapper
-const asyncHandler = (fn) => (req, res, next) => {
-  Promise.resolve(fn(req, res, next)).catch(next);
-};
-
 // Global error handler with detailed logging
 app.use((error, req, res, next) => {
   console.error('Error Details:', {
@@ -1027,28 +1027,32 @@ app.use('*', (req, res) => {
   }
 });
 
-// Start server
-const PORT = process.env.PORT || 3000;
-const HOST = '0.0.0.0';
+// For serverless deployment
+if (process.env.NODE_ENV !== 'production') {
+  // Local development server
+  const PORT = process.env.PORT || 3000;
+  const HOST = '0.0.0.0';
 
-connectDB().then(() => {
-  app.listen(PORT, HOST, () => {
-    console.log(`LeadFlow Pro API server running on http://${HOST}:${PORT}`);
-    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`Database: Connected to MongoDB`);
+  connectDB().then(() => {
+    app.listen(PORT, HOST, () => {
+      console.log(`LeadFlow Pro API server running on http://${HOST}:${PORT}`);
+      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`Database: Connected to MongoDB`);
+    });
+  }).catch(error => {
+    console.error('Failed to start server:', error);
+    process.exit(1);
   });
-}).catch(error => {
-  console.error('Failed to start server:', error);
-  process.exit(1);
-});
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
-  mongoose.connection.close(() => {
-    console.log('MongoDB connection closed');
-    process.exit(0);
+  // Graceful shutdown
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    mongoose.connection.close(() => {
+      console.log('MongoDB connection closed');
+      process.exit(0);
+    });
   });
-});
+}
 
+// Export for serverless
 module.exports = app;
