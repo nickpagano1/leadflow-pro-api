@@ -280,6 +280,11 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// Simple test endpoint
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Test endpoint works', timestamp: new Date().toISOString() });
+});
+
 // Database health check endpoint
 app.get('/api/healthdb', asyncHandler(async (req, res) => {
   try {
