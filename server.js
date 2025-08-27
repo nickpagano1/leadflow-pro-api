@@ -447,6 +447,10 @@ app.post('/api/auth/signup', asyncHandler(async (req, res) => {
       subscription: user.subscription
     }
   });
+  } catch (error) {
+    console.error('Signup error:', error);
+    res.status(500).json({ error: 'Internal server error during signup' });
+  }
 }));
 
 app.post('/api/auth/login', asyncHandler(async (req, res) => {
