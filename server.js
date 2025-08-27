@@ -8,6 +8,7 @@ const helmet = require('helmet');
 const compression = require('compression');
 const nodemailer = require('nodemailer');
 const validator = require('validator');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -800,7 +801,7 @@ app.post('/api/scan/leads', authenticateToken, async (req, res) => {
 
 // Homepage route - serve your website
 app.get('/', (req, res) => {
-  res.sendFile('index.html', { root: __dirname + '/public' });
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Global error handler
