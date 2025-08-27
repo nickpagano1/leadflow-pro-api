@@ -20,11 +20,7 @@ app.get('/api/test2', (req, res) => {
   res.json({ message: 'Test2 works', timestamp: new Date().toISOString() });
 });
 
-// Catch all for debugging
-app.use('*', (req, res) => {
-  console.log('Catch-all route:', req.method, req.path);
-  res.status(404).json({ error: 'Route not found in minimal test', path: req.path });
-});
+// No catch-all to test if that's interfering
 
 console.log('Minimal server setup complete');
 module.exports = app;
