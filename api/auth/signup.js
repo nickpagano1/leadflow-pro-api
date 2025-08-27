@@ -1,36 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const validator = require('validator');
 require('dotenv').config();
-
-// MongoDB connection
-let cachedConnection = null;
-
-const connectDB = async () => {
-  if (cachedConnection && mongoose.connection.readyState === 1) {
-    return cachedConnection;
-  }
-  
-  try {
-    const connection = await mongoose.connect(process.env.MONGODB_URI, {
-      bufferCommands: false,
-      maxPoolSize: 1,
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
-      family: 4,
-      maxIdleTimeMS: 30000,
-      retryWrites: true
-    });
-    
-    cachedConnection = connection;
-    console.log('MongoDB connected successfully');
-    return connection;
-  } catch (error) {
-    console.error('MongoDB connection error:', error);
-    throw new Error(`Database connection failed: ${error.message}`);
-  }
-};
 
 // User Schema
 const userSchema = new mongoose.Schema({
@@ -104,7 +75,16 @@ module.exports = async (req, res) => {
   });
 
   try {
-    await connectDB();
+    // Connect to MongoDB (same as login)
+    await mongoose.connect(process.env.MONGODB_URI, {
+      bufferCommands: false,
+      maxPoolSize: 1,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      family: 4,
+      maxIdleTimeMS: 30000,
+      retryWrites: true
+    });
     
     const { email, password, first_name, last_name, company, phone, plan } = req.body;
 
