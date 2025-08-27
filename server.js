@@ -599,6 +599,8 @@ app.get('/api/email/config', authenticateToken, asyncHandler(async (req, res) =>
 
 app.post('/api/email/test', authenticateToken, asyncHandler(async (req, res) => {
   await connectDB();
+  
+  try {
     const config = await EmailConfig.findOne({ userId: req.user.userId });
     
     if (!config) {
@@ -630,11 +632,13 @@ app.post('/api/email/test', authenticateToken, asyncHandler(async (req, res) => 
     console.error('Email test error:', error);
     res.status(500).json({ error: 'Failed to send test email' });
   }
-});
+}));
 
 // Lead management endpoints
 app.post('/api/leads', authenticateToken, asyncHandler(async (req, res) => {
   await connectDB();
+  
+  try {
     const { email, firstName, lastName, company, phone, source, tags, notes, value } = req.body;
 
     if (!email) {
@@ -668,10 +672,12 @@ app.post('/api/leads', authenticateToken, asyncHandler(async (req, res) => {
     console.error('Create lead error:', error);
     res.status(500).json({ error: 'Failed to create lead' });
   }
-});
+}));
 
 app.get('/api/leads', authenticateToken, asyncHandler(async (req, res) => {
   await connectDB();
+  
+  try {
     const { page = 1, limit = 50, status, source, search } = req.query;
     
     const query = { userId: req.user.userId };
@@ -708,11 +714,13 @@ app.get('/api/leads', authenticateToken, asyncHandler(async (req, res) => {
     console.error('Get leads error:', error);
     res.status(500).json({ error: 'Failed to retrieve leads' });
   }
-});
+}));
 
 // Automation endpoints
 app.post('/api/campaigns', authenticateToken, asyncHandler(async (req, res) => {
   await connectDB();
+  
+  try {
     const { name, subject, content, recipients, scheduledAt } = req.body;
 
     if (!name || !subject || !content) {
@@ -738,10 +746,12 @@ app.post('/api/campaigns', authenticateToken, asyncHandler(async (req, res) => {
     console.error('Create campaign error:', error);
     res.status(500).json({ error: 'Failed to create campaign' });
   }
-});
+}));
 
 app.get('/api/campaigns', authenticateToken, asyncHandler(async (req, res) => {
   await connectDB();
+  
+  try {
     const campaigns = await Campaign.find({ userId: req.user.userId })
       .sort({ createdAt: -1 });
 
@@ -750,7 +760,7 @@ app.get('/api/campaigns', authenticateToken, asyncHandler(async (req, res) => {
     console.error('Get campaigns error:', error);
     res.status(500).json({ error: 'Failed to retrieve campaigns' });
   }
-});
+}));
 
 app.post('/api/campaigns/:id/send', authenticateToken, asyncHandler(async (req, res) => {
   await connectDB();
