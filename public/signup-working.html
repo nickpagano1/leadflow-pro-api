@@ -242,17 +242,30 @@ Ready to login and get started?`;
                     }
                 } else {
                     result.className = 'result error';
-                    result.innerHTML = `❌ ACCOUNT CREATION FAILED
+                    let errorMsg = `❌ ACCOUNT CREATION FAILED
 
-Error: ${responseData.error || 'Unknown error occurred'}
+Error: ${responseData.error || 'Unknown error occurred'}`;
 
-${responseData.error === 'Route not found' ? 
-'⚠️ DEPLOYMENT ISSUE: New API routes are not deploying to Vercel.\n\nThis is a platform configuration issue, not a code issue.\nThe signup functionality is implemented but Vercel is not recognizing the new routes.' : ''}
+                    if (responseData.error === 'Route not found') {
+                        errorMsg += `
 
-${responseData.required ? 'Required fields: ' + responseData.required.join(', ') : ''}
-${responseData.details ? '\nDetails: ' + responseData.details : ''}
+⚠️ DEPLOYMENT ISSUE: New API routes are not deploying to Vercel.
 
-Check F12 Console for endpoint test results.`;
+This is a platform configuration issue, not a code issue.
+The signup functionality is implemented but Vercel is not recognizing the new routes.`;
+                    }
+
+                    if (responseData.required) {
+                        errorMsg += `\n\nRequired fields: ${responseData.required.join(', ')}`;
+                    }
+
+                    if (responseData.details) {
+                        errorMsg += `\nDetails: ${responseData.details}`;
+                    }
+
+                    errorMsg += `\n\nCheck F12 Console for endpoint test results.`;
+                    
+                    result.innerHTML = errorMsg;
                 }
             } catch (error) {
                 console.error('💥 Network Error:', error);
