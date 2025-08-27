@@ -17,12 +17,25 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.disabled = true;
         submitBtn.textContent = 'Creating Account...';
         
+        const emailField = document.getElementById('email');
+        const firstNameField = document.getElementById('firstName');
+        const lastNameField = document.getElementById('lastName');
+        const companyField = document.getElementById('company');
+        const passwordField = document.getElementById('password');
+        
+        console.log('Field values:');
+        console.log('Email:', emailField ? emailField.value : 'FIELD NOT FOUND');
+        console.log('First Name:', firstNameField ? firstNameField.value : 'FIELD NOT FOUND');
+        console.log('Last Name:', lastNameField ? lastNameField.value : 'FIELD NOT FOUND');
+        console.log('Company:', companyField ? companyField.value : 'FIELD NOT FOUND');
+        console.log('Password:', passwordField ? passwordField.value.length + ' characters' : 'FIELD NOT FOUND');
+        
         const data = {
-            email: document.getElementById('email').value,
-            first_name: document.getElementById('firstName').value,
-            last_name: document.getElementById('lastName').value,
-            company: document.getElementById('company').value,
-            password: document.getElementById('password').value,
+            email: emailField ? emailField.value : '',
+            first_name: firstNameField ? firstNameField.value : '',
+            last_name: lastNameField ? lastNameField.value : '',
+            company: companyField ? companyField.value : '',
+            password: passwordField ? passwordField.value : '',
             phone: '5551234567',
             plan: 'premium'
         };
