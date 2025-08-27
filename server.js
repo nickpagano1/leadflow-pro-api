@@ -764,6 +764,8 @@ app.get('/api/campaigns', authenticateToken, asyncHandler(async (req, res) => {
 
 app.post('/api/campaigns/:id/send', authenticateToken, asyncHandler(async (req, res) => {
   await connectDB();
+  
+  try {
     const campaign = await Campaign.findOne({
       _id: req.params.id,
       userId: req.user.userId
@@ -838,11 +840,13 @@ app.post('/api/campaigns/:id/send', authenticateToken, asyncHandler(async (req, 
     console.error('Send campaign error:', error);
     res.status(500).json({ error: 'Failed to send campaign' });
   }
-});
+}));
 
 // User profile endpoints
 app.get('/api/profile', authenticateToken, asyncHandler(async (req, res) => {
   await connectDB();
+  
+  try {
     const user = await User.findById(req.user.userId).select('-password');
     
     if (!user) {
@@ -854,10 +858,12 @@ app.get('/api/profile', authenticateToken, asyncHandler(async (req, res) => {
     console.error('Get profile error:', error);
     res.status(500).json({ error: 'Failed to retrieve profile' });
   }
-});
+}));
 
 app.put('/api/profile', authenticateToken, asyncHandler(async (req, res) => {
   await connectDB();
+  
+  try {
     const { firstName, lastName, company, phone } = req.body;
 
     const user = await User.findByIdAndUpdate(
@@ -879,11 +885,13 @@ app.put('/api/profile', authenticateToken, asyncHandler(async (req, res) => {
     console.error('Update profile error:', error);
     res.status(500).json({ error: 'Failed to update profile' });
   }
-});
+}));
 
 // Stats endpoints
 app.get('/api/stats', authenticateToken, asyncHandler(async (req, res) => {
   await connectDB();
+  
+  try {
     const totalLeads = await Lead.countDocuments({ userId: req.user.userId });
     const newLeads = await Lead.countDocuments({ 
       userId: req.user.userId, 
@@ -927,11 +935,13 @@ app.get('/api/stats', authenticateToken, asyncHandler(async (req, res) => {
     console.error('Get stats error:', error);
     res.status(500).json({ error: 'Failed to retrieve stats' });
   }
-});
+}));
 
 // Lead scanning endpoint
 app.post('/api/scan/leads', authenticateToken, asyncHandler(async (req, res) => {
   await connectDB();
+  
+  try {
     const { source, criteria } = req.body;
 
     if (!source) {
@@ -968,7 +978,7 @@ app.post('/api/scan/leads', authenticateToken, asyncHandler(async (req, res) => 
     console.error('Scan leads error:', error);
     res.status(500).json({ error: 'Failed to scan leads' });
   }
-});
+}));
 
 // Homepage route - serve your website
 app.get('/', (req, res) => {
