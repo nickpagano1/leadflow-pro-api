@@ -57,14 +57,26 @@ app.use((req, res, next) => {
 // Serve static files
 app.use(express.static('public'));
 
-// MongoDB connection
+// MongoDB connection with connection pooling for serverless
+let isConnected = false;
+
 const connectDB = async () => {
+  if (isConnected) {
+    return;
+  }
+  
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGODB_URI, {
+      bufferCommands: false,
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
+    isConnected = true;
     console.log('MongoDB connected successfully');
   } catch (error) {
     console.error('MongoDB connection error:', error);
-    process.exit(1);
+    throw error;
   }
 };
 
@@ -333,24 +345,34 @@ app.post('/api/auth/register', async (req, res) => {
 // Signup endpoint (alias for register to match frontend)
 app.post('/api/auth/signup', async (req, res) => {
   try {
+    // Connect to MongoDB
+    await connectDB();
+    
     const { email, password, first_name, last_name, company, phone, plan } = req.body;
+
+    console.log('Signup attempt for:', email);
+    console.log('Received data:', { email, first_name, last_name, company, has_password: !!password });
 
     // Validation
     if (!email || !password || !first_name || !last_name) {
+      console.log('Missing required fields:', { email: !!email, password: !!password, first_name: !!first_name, last_name: !!last_name });
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
     if (!validator.isEmail(email)) {
+      console.log('Invalid email format:', email);
       return res.status(400).json({ error: 'Invalid email format' });
     }
 
     if (password.length < 6) {
+      console.log('Password too short:', password.length);
       return res.status(400).json({ error: 'Password must be at least 6 characters' });
     }
 
     // Check if user exists
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
+      console.log('User already exists:', email);
       return res.status(400).json({ error: 'User already exists' });
     }
 
@@ -370,6 +392,7 @@ app.post('/api/auth/signup', async (req, res) => {
     });
 
     await user.save();
+    console.log('User created successfully:', user._id);
 
     // Generate JWT
     const token = jwt.sign(
@@ -394,8 +417,15 @@ app.post('/api/auth/signup', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Signup error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Signup error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
