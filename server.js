@@ -584,6 +584,11 @@ Check browser console (F12) for technical details.\`;
   res.status(200).send(html);
 });
 
+// Simple test endpoint
+app.get('/api/test-simple', (req, res) => {
+  res.json({ status: 'simple test works', timestamp: new Date().toISOString() });
+});
+
 // WORKING SIGNUP API (bypasses serverless function conflicts)
 app.post('/api/signup', asyncHandler(async (req, res) => {
   console.log('=== WORKING SIGNUP REQUEST ===');
