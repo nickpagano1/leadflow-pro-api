@@ -285,6 +285,34 @@ app.get('/api/test', (req, res) => {
   res.json({ message: 'Test endpoint works', timestamp: new Date().toISOString() });
 });
 
+// Debug endpoint to check what routes are registered
+app.get('/api/debug/routes', (req, res) => {
+  const routes = [];
+  app._router.stack.forEach((middleware) => {
+    if (middleware.route) {
+      routes.push({
+        path: middleware.route.path,
+        methods: Object.keys(middleware.route.methods)
+      });
+    } else if (middleware.name === 'router') {
+      middleware.handle.stack.forEach((handler) => {
+        if (handler.route) {
+          routes.push({
+            path: handler.route.path,
+            methods: Object.keys(handler.route.methods)
+          });
+        }
+      });
+    }
+  });
+  res.json({ 
+    message: 'Registered routes',
+    count: routes.length,
+    routes: routes.slice(0, 20), // Show first 20
+    timestamp: new Date().toISOString() 
+  });
+});
+
 // Database health check endpoint
 app.get('/api/healthdb', asyncHandler(async (req, res) => {
   try {
