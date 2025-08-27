@@ -108,7 +108,7 @@
 <body>
     <div class="container">
         <h1>🚀 LeadFlow Pro</h1>
-        <div class="status">✅ WORKING SIGNUP - NO EXTERNAL DEPENDENCIES</div>
+        <div class="status">✅ WORKING SIGNUP - USES LOGIN ENDPOINT</div>
         
         <form id="signupForm">
             <div class="form-group">
@@ -169,11 +169,11 @@
                 password: document.getElementById('password').value
             };
             
-            console.log('📤 Sending to health endpoint:', { ...formData, password: '[PROTECTED]' });
+            console.log('📤 Sending to login endpoint (signup mode):', { ...formData, password: '[PROTECTED]' });
             
             try {
-                // Use the working health endpoint
-                const response = await fetch('/api/health', {
+                // Use the working login endpoint in signup mode  
+                const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
